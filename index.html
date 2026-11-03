@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>北千住ランチマップ（試作）</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{--bg:#f6f5f0;--fg:#1f2a37;--muted:#5b6570;--card:#fff;--line:#dfe3e6;--accent:#1f6f8b;--accent-fg:#fff;--soft:#e6f0f3;--ok:#2e7d4f;color-scheme:light dark}
+@media (prefers-color-scheme:dark){:root{--bg:#161a1e;--fg:#e8ecef;--muted:#9aa5af;--card:#20262b;--line:#343c43;--accent:#6bb8d1;--accent-fg:#0f1a20;--soft:#1f323a;--ok:#4fae78}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 "Noto Sans JP","Hiragino Sans",Meiryo,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.7rem;margin:0 0 4px;color:var(--accent)}
+.sub,.note,.meta{color:var(--muted);font-size:.88rem}
+.sub{margin:0 0 14px}
+.filters{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;align-items:end}
+@media(min-width:700px){.filters{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:960px){.filters{grid-template-columns:repeat(6,auto);justify-content:start}}
+.filters label{display:flex;flex-direction:column;font-size:.8rem;color:var(--muted);gap:2px}
+.chk{flex-direction:row!important;align-items:center;gap:6px!important;font-size:.95rem!important;color:var(--fg)!important}
+select,button{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-height:44px;width:100%}
+.chk input{width:auto;min-height:0}
+#count{margin:14px 0 8px}
+.grid{display:grid;gap:14px;grid-template-areas:"map" "detail" "list"}
+@media(min-width:860px){.grid{grid-template-columns:1.2fr 1fr;grid-template-areas:"map detail" "map list";grid-template-rows:auto 1fr;align-items:start}}
+#map{grid-area:map;height:46vh;min-height:300px;border:1px solid var(--line);border-radius:12px;font-family:inherit}
+@media(min-width:860px){#map{height:78vh;position:sticky;top:12px}}
+#detail{grid-area:detail;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+#list{grid-area:list}
+#detail h2{margin:0 0 4px;font-size:1.35rem}
+.tag{display:inline-block;background:var(--soft);border-radius:6px;padding:0 8px;font-size:.78rem}
+.v{color:var(--ok);font-weight:700;font-size:.8rem;margin-left:8px}
+.photo{height:130px;border:1px dashed var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.85rem;margin:10px 0}
+dl{display:grid;grid-template-columns:7.5em 1fr;gap:4px 8px;margin:8px 0;font-size:.95rem}dt{color:var(--muted)}dd{margin:0}
+.big{font-size:1.4rem;color:var(--accent)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.btns>*{flex:1 1 auto;text-align:center;width:auto}
+.pri{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);font-weight:700}
+a.btn{display:inline-block;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:10px;color:var(--fg);background:var(--bg)}
+.off{opacity:.55}
+.card{display:flex;justify-content:space-between;gap:12px;align-items:center;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;min-height:0}
+.card.sel{outline:2px solid var(--accent)}
+.card[data-c="和食"]{border-left-color:#c2410c}.card[data-c="洋食"]{border-left-color:#b91c4d}.card[data-c="中華"]{border-left-color:#b45309}.card[data-c="韓国・弁当"]{border-left-color:#6d28d9}
+.cl{min-width:0}.cr{text-align:right;flex:none}
+.pr{font-size:1.5rem;font-weight:700;color:var(--accent);line-height:1.1}.pr small{font-size:.75rem;font-weight:400;color:var(--muted)}
+.wk{display:inline-block;margin-top:4px;background:var(--soft);border-radius:999px;padding:0 10px;font-size:.8rem}
+.pin{width:34px;height:34px;border-radius:50%;background:var(--card);border:3px solid var(--accent);color:var(--fg);font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.pin.vis{background:var(--ok);color:#fff;border-color:var(--ok)}
+.pin.sel{border-color:#e11d48;transform:scale(1.2)}
+.pin.dim{opacity:.3}
+.pl{position:absolute;top:37px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px;font-weight:700;color:#1f2a37;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff}
+details{margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+textarea{width:100%;height:140px;font:12px/1.4 monospace;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px}
+</style>
+</head>
+<body>
+<main>
+<h1>北千住ランチマップ（試作）</h1>
+<p class="sub">東京電機大学 東京千住キャンパスから歩ける、昼休みに食事ができる個人店・少数店舗の9店です。</p>
+<div class="filters">
+<label>予算（最安メニュー）<select id="fb"><option value="0">指定なし</option><option value="700">700円まで</option><option value="900">900円まで</option><option value="1100">1,100円まで</option><option value="1300">1,300円まで</option></select></label>
+<label>ジャンル<select id="fc"><option value="">すべて</option><option>和食</option><option>洋食</option><option>中華</option><option>韓国・弁当</option></select></label>
+<label>大学からの徒歩<select id="fw"><option value="0">指定なし</option><option value="3">3分以内</option><option value="4">4分以内</option></select></label>
+<label>並び替え<select id="fs"><option value="id">おすすめ順</option><option value="p">価格が安い順</option><option value="w">徒歩が近い順</option></select></label>
+<label class="chk"><input type="checkbox" id="fu"> まだ行っていない店だけ</label>
+<button id="rs" type="button">条件をリセット</button>
+</div>
+<div id="count" class="meta"></div>
+<div class="grid"><div id="map" role="region" aria-label="店舗の地図"></div><aside id="detail"></aside><div id="list"></div></div>
+<details><summary>閲覧ログ（試作の確認用）</summary>
+<p class="note">どの店のどの情報を見たかの記録の例です。このブラウザ内にだけ保存されます。</p>
+<textarea id="log" readonly></textarea><div class="btns"><button id="clr">ログを消す</button></div></details>
+<p class="note">試作版です。店舗情報は2026年11月3日時点の調査で、入口の写真は未掲載です。地図データ © OpenStreetMap contributors、地理院タイル</p>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+var UNIV=null; // 大学の [緯度, 経度] を入れると、大学のピンも表示されます
+var S=[
+{id:1,n:"究極のまかないここのつ",g:"和食・定食",c:"和食",h:"11:00〜15:00",cl:"日曜",w:4,p:750,m:"究極のレバニラ定食",mp:900,lat:35.750687,lng:139.806456},
+{id:2,n:"REGALO",g:"イタリアン・カフェ",c:"洋食",h:"11:30〜14:30",cl:"月曜・第1火曜",w:4,p:1200,m:"背徳のカルボナーラ",mp:1290,lat:35.750609,lng:139.806649},
+{id:3,n:"ビストロウエハラ",g:"フレンチ・ビストロ・洋食",c:"洋食",h:"11:30〜14:00",cl:"水曜・第2、第4火曜",w:3,p:2200,m:"平日限定ランチ",mp:2200,lat:35.750274,lng:139.806623},
+{id:4,n:"マダム アン ホームキッチン中華私房菜",g:"中華料理",c:"中華",h:"11:00〜15:00",cl:"なし",w:3,p:990,m:"絶品黒酢のすぶた",mp:1320,lat:35.749812,lng:139.806295},
+{id:5,n:"マルキン北千住店",g:"韓国料理・焼肉弁当",c:"韓国・弁当",h:"10:30〜19:00",cl:"日曜",w:3,p:600,m:"カルビ弁当",mp:750,lat:35.749481,lng:139.806124},
+{id:6,n:"Pizzeria ALLORO",g:"イタリアン・ピザ・パスタ",c:"洋食",h:"11:30〜14:30",cl:"日曜",w:3,p:1250,m:"マルゲリータ（普通サイズ）",mp:1400,lat:35.749122,lng:139.805899},
+{id:7,n:"五月家",g:"和食・日本料理",c:"和食",h:"11:30〜14:30",cl:"水曜・第2、第4火曜",w:3,p:928,m:"月替わり 旬菜弁当",mp:1219,lat:35.749212,lng:139.806925},
+{id:8,n:"さかなや いいとこ",g:"海鮮料理・和食",c:"和食",h:"11:30〜14:00",cl:"日曜・祝日",w:3,p:980,m:"いいとこ名物バラチラシ丼ランチ",mp:980,lat:35.749489,lng:139.807599},
+{id:9,n:"italianbar Sanire北千住店",g:"イタリアン・パスタ",c:"洋食",h:"11:00〜（通し営業）",cl:"不定休",w:4,p:700,m:"名物！黒いカルボナーラ",mp:1300,lat:35.749381,lng:139.808882}];
+var SN={1:"ここのつ",2:"REGALO",3:"ウエハラ",4:"マダムアン",5:"マルキン",6:"ALLORO",7:"五月家",8:"いいとこ",9:"Sanire"};
+var st={b:0,c:"",w:0,u:false,o:"id",sel:null},vis={},logs=[];
+function ld(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+vis=ld("vis",{});logs=ld("logs",[]);
+function lg(type,o){o=o||{};o.t=new Date().toISOString();o.type=type;logs.push(o);sv("logs",logs);document.getElementById("log").value=JSON.stringify(logs,null,1)}
+function yen(n){return n.toLocaleString("ja-JP")+"円"}
+function ok(s){return (!st.b||s.p<=st.b)&&(!st.c||s.c===st.c)&&(!st.w||s.w<=st.w)&&(!st.u||!vis[s.id])}
+function cmp(a,b){if(st.o==="p")return a.p-b.p;if(st.o==="w")return a.w-b.w||a.p-b.p;return a.id-b.id}
+function find(id){return S.filter(function(s){return s.id===id})[0]}
+var map=L.map("map").setView([35.7498,139.8063],17);
+var osm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,referrerPolicy:"strict-origin-when-cross-origin",attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
+var gsi=L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",{maxZoom:18,attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html">地理院タイル</a>'});
+osm.addTo(map);
+L.control.layers({"OpenStreetMap":osm,"地理院地図":gsi},null,{collapsed:false,position:"topright"}).addTo(map);
+map.fitBounds(S.map(function(s){return [s.lat,s.lng]}),{padding:[40,40],maxZoom:18});
+if(UNIV){L.marker(UNIV,{icon:L.divIcon({className:"",html:'<div class="pin" style="border-color:#e11d48">大</div><div class="pl">大学</div>',iconSize:[34,34],iconAnchor:[17,17]})}).addTo(map)}
+function icon(s){var c="pin"+(st.sel===s.id?" sel":"")+(vis[s.id]?" vis":"")+(ok(s)?"":" dim");
+ return L.divIcon({className:"",html:'<div class="'+c+'">'+s.id+'</div><div class="pl">'+SN[s.id]+'</div>',iconSize:[34,34],iconAnchor:[17,17]})}
+var mk={};
+S.forEach(function(s){mk[s.id]=L.marker([s.lat,s.lng],{icon:icon(s),title:s.n}).addTo(map).on("click",function(){pick(s.id,false)})});
+function pick(id,fromList){st.sel=id;var s=find(id);lg("open_detail",{store:s.n});render();map.panTo([s.lat,s.lng]);
+ if(fromList&&window.innerWidth<860){document.getElementById("detail").scrollIntoView({behavior:"smooth",block:"start"})}}
+function render(){
+ var list=S.filter(ok).sort(cmp);
+ document.getElementById("count").textContent=list.length+"店が条件に合います（全"+S.length+"店）";
+ document.getElementById("list").innerHTML=list.length?list.map(function(s){return '<button class="card'+(st.sel===s.id?' sel':'')+'" data-c="'+s.c+'" data-id="'+s.id+'"><div class="cl"><b>'+s.id+'. '+s.n+'</b>'+(vis[s.id]?'<span class="v">✓ 行った</span>':'')+'<div class="meta">'+s.g+'</div><div class="meta">'+s.h+'　休み：'+s.cl+'</div></div><div class="cr"><div class="pr">'+s.p.toLocaleString("ja-JP")+'<small>円〜</small></div><div class="wk">徒歩'+s.w+'分</div></div></button>'}).join(""):'<p class="meta">条件に合う店がありません。条件をゆるめてください。</p>';
+ S.forEach(function(s){mk[s.id].setIcon(icon(s));mk[s.id].setZIndexOffset(st.sel===s.id?1000:0)});
+ var D=document.getElementById("detail"),s=st.sel&&find(st.sel);
+ if(!s){D.innerHTML='<p class="meta">地図のピンか、店の一覧を選ぶと、詳細が表示されます。</p>';return}
+ D.innerHTML='<h2>'+s.id+'. '+s.n+'</h2><span class="tag">'+s.g+'</span>'+(vis[s.id]?'<span class="v">✓ 行った</span>':'')+
+ '<div class="photo">入口の写真（撮影後に掲載予定）</div><dl><dt>最安のメニュー</dt><dd><b class="big">'+yen(s.p)+'〜</b>（税込）</dd><dt>代表メニュー</dt><dd>'+s.m+'　'+yen(s.mp)+'</dd><dt>営業時間</dt><dd>'+s.h+'</dd><dt>定休日</dt><dd>'+s.cl+'</dd><dt>大学から</dt><dd>徒歩'+s.w+'分</dd></dl>'+
+ '<div class="btns"><button class="pri" id="vb">'+(vis[s.id]?'「行った」を取り消す':'行った店として記録する')+'</button><a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+s.lat+','+s.lng+'">Googleマップで開く</a><span class="btn off">訪問報告フォーム（準備中）</span></div>';
+ document.getElementById("vb").onclick=function(){vis[s.id]=!vis[s.id];if(!vis[s.id])delete vis[s.id];sv("vis",vis);lg("visited",{store:s.n,value:!!vis[s.id]});render()};
+}
+document.getElementById("list").addEventListener("click",function(e){var el=e.target.closest("[data-id]");if(el)pick(+el.getAttribute("data-id"),true)});
+function bind(id,key,num){document.getElementById(id).onchange=function(){var v=this.type==="checkbox"?this.checked:(num?+this.value:this.value);st[key]=v;lg("filter",{key:key,value:v});render()}}
+bind("fb","b",1);bind("fc","c");bind("fw","w",1);bind("fu","u");bind("fs","o");
+document.getElementById("rs").onclick=function(){st.b=0;st.c="";st.w=0;st.u=false;st.o="id";document.getElementById("fb").value="0";document.getElementById("fc").value="";document.getElementById("fw").value="0";document.getElementById("fs").value="id";document.getElementById("fu").checked=false;lg("filter_reset");render()};
+document.getElementById("clr").onclick=function(){logs=[];sv("logs",logs);document.getElementById("log").value=""};
+document.getElementById("log").value=logs.length?JSON.stringify(logs,null,1):"";
+render();
+</script>
+</body>
+</html>
