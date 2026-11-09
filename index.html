@@ -103,9 +103,9 @@ function yen(n){return n.toLocaleString("ja-JP")+"円"}
 function ok(s){return (!st.b||s.p<=st.b)&&(!st.c||s.c===st.c)&&(!st.w||s.w<=st.w)&&(!st.u||!vis[s.id])}
 function cmp(a,b){if(st.o==="p")return a.p-b.p;if(st.o==="w")return a.w-b.w||a.p-b.p;return a.id-b.id}
 function find(id){return S.filter(function(s){return s.id===id})[0]}
-function reportUrl(s){
+function reportUrl(s,visited){
  var url="https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform?usp=pp_url";
- return url+"&entry.273635376=P1&entry.2072569150=2026-11-10&entry.1368935237="+encodeURIComponent(s.n)+"&entry.270935127=%E3%81%AF%E3%81%84&entry.1703917794=%E6%9C%AC%E3%82%A2%E3%83%97%E3%83%AA%E3%82%92%E8%A6%8B%E3%81%A6&entry.1528988745=%E4%BE%A1%E6%A0%BC&entry.1552917334=800";
+ return url+"&entry.273635376=P1&entry.2072569150=2026-11-10&entry.1368935237="+encodeURIComponent(s.n)+"&entry.270935127="+encodeURIComponent(visited?"はい":"いいえ")+"&entry.1703917794=%E6%9C%AC%E3%82%A2%E3%83%97%E3%83%AA%E3%82%92%E8%A6%8B%E3%81%A6&entry.1528988745=%E4%BE%A1%E6%A0%BC&entry.1552917334=800";
 }
 var map=L.map("map").setView(CAMPUS,17);
 var osm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,referrerPolicy:"strict-origin-when-cross-origin",attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
@@ -147,7 +147,7 @@ function render(){
  if(!s){D.innerHTML='<p class="meta">地図のピンか、店の一覧を選ぶと、詳細が表示されます。</p>';return}
  D.innerHTML='<h2>'+s.id+'. '+s.n+'</h2><span class="tag">'+s.g+'</span>'+(vis[s.id]?'<span class="v">✓ 行った</span>':'')+
  '<div class="photo">入口の写真（撮影後に掲載予定）</div><dl><dt>最安のメニュー</dt><dd><b class="big">'+yen(s.p)+'〜</b>（税込）</dd><dt>代表メニュー</dt><dd>'+s.m+'　'+yen(s.mp)+'</dd><dt>営業時間</dt><dd>'+s.h+'</dd><dt>定休日</dt><dd>'+s.cl+'</dd><dt>大学から</dt><dd>徒歩'+s.w+'分</dd></dl>'+
- '<div class="btns"><button class="pri" id="vb">'+(vis[s.id]?'「行った」を取り消す':'行った店として記録する')+'</button><a class="btn" href="'+reportUrl(s)+'" target="_blank" rel="noopener">訪問報告フォーム</a></div>';
+ '<div class="btns"><button class="pri" id="vb">'+(vis[s.id]?'「行った」を取り消す':'行った店として記録する')+'</button><a class="btn" href="'+reportUrl(s,true)+'" target="_blank" rel="noopener">行った報告</a><a class="btn" href="'+reportUrl(s,false)+'" target="_blank" rel="noopener">行かなかった報告</a></div>';
  document.getElementById("vb").onclick=function(){vis[s.id]=!vis[s.id];if(!vis[s.id])delete vis[s.id];sv("vis",vis);lg("visited",{store:s.n,value:!!vis[s.id]});render()};
 }
 document.getElementById("list").addEventListener("click",function(e){var el=e.target.closest("[data-id]");if(el)pick(+el.getAttribute("data-id"),true)});
