@@ -26,9 +26,11 @@ select,button{font:inherit;color:var(--fg);background:var(--bg);border:1px solid
 #fw,#fs{width:auto;min-width:170px}.reset{width:auto;min-height:40px}
 #count{margin:14px 0 8px}
 .grid{display:grid;gap:14px;grid-template-areas:"map" "detail" "list"}
+.grid>div:first-child{grid-area:map}
 @media(min-width:860px){.grid{grid-template-columns:1.2fr 1fr;grid-template-areas:"map detail" "map list";grid-template-rows:auto 1fr;align-items:start}}
 #map{grid-area:map;height:46vh;min-height:300px;border:1px solid var(--line);border-radius:12px;font-family:inherit}
 @media(min-width:860px){#map{height:78vh;position:sticky;top:12px}}
+.map-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.map-actions button{width:auto;min-height:40px}.location-status{color:var(--muted);font-size:.8rem}
 #detail{grid-area:detail;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
 #list{grid-area:list}
 #list-title{margin:0 0 10px;font-size:1.15rem}#list-title small{display:block;color:var(--muted);font-size:.75rem;font-weight:400}
@@ -72,7 +74,7 @@ textarea{width:100%;height:140px;font:12px/1.4 monospace;color:var(--fg);backgro
 <div class="filter-tools"><label class="filter-title" for="fw">歩くならどこまで？</label><select id="fw"><option value="0">距離は気にしない</option><option value="3">徒歩3分以内</option><option value="4">徒歩4分以内</option></select><label class="chk"><input type="checkbox" id="fu"> 未訪問のお店だけ</label><label class="filter-title" for="fs">並び順</label><select id="fs"><option value="id">🏆 おすすめランキング</option><option value="p">価格が安い順</option><option value="w">徒歩が近い順</option></select><button id="rs" class="reset" type="button">↺ 条件をリセット</button></div>
 </div>
 <div id="count" class="meta"></div>
-<div class="grid"><div id="map" role="region" aria-label="店舗の地図"></div><aside id="detail"></aside><div id="list"></div></div>
+<div class="grid"><div><div id="map" role="region" aria-label="店舗の地図"></div><div class="map-actions"><button id="campusBtn" type="button">🏫 1号館に戻る</button><button id="locationBtn" type="button">📍 現在位置に戻る</button><span id="locationStatus" class="location-status" role="status"></span></div></div><aside id="detail"></aside><div id="list"></div></div>
 <details><summary>閲覧ログ（試作の確認用）</summary>
 <p class="note">どの店のどの情報を見たかの記録の例です。このブラウザ内にだけ保存されます。</p>
 <textarea id="log" readonly></textarea><div class="btns"><button id="clr">ログを消す</button></div></details>
@@ -80,7 +82,7 @@ textarea{width:100%;height:140px;font:12px/1.4 monospace;color:var(--fg);backgro
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
-var UNIV=null; // 大学の [緯度, 経度] を入れると、大学のピンも表示されます
+var CAMPUS=[35.7486,139.8060];
 var S=[
 {id:1,n:"究極のまかないここのつ",g:"和食・定食",c:"和食",h:"11:00〜15:00",cl:"日曜",w:4,p:750,m:"究極のレバニラ定食",mp:900,lat:35.750687,lng:139.806456},
 {id:2,n:"REGALO",g:"イタリアン・カフェ",c:"洋食",h:"11:30〜14:30",cl:"月曜・第1火曜",w:4,p:1200,m:"背徳のカルボナーラ",mp:1290,lat:35.750609,lng:139.806649},
@@ -105,11 +107,30 @@ function reportUrl(s){
  var url="https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform?usp=pp_url";
  return url+"&entry.273635376=P1&entry.2072569150=2026-11-10&entry.1368935237="+encodeURIComponent(s.n)+"&entry.270935127=%E3%81%AF%E3%81%84&entry.1703917794=%E6%9C%AC%E3%82%A2%E3%83%97%E3%83%AA%E3%82%92%E8%A6%8B%E3%81%A6&entry.1528988745=%E4%BE%A1%E6%A0%BC&entry.1552917334=800";
 }
-var map=L.map("map").setView([35.7498,139.8063],17);
+var map=L.map("map").setView(CAMPUS,17);
 var osm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,referrerPolicy:"strict-origin-when-cross-origin",attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
 osm.addTo(map);
-map.fitBounds(S.map(function(s){return [s.lat,s.lng]}),{padding:[40,40],maxZoom:18});
-if(UNIV){L.marker(UNIV,{icon:L.divIcon({className:"",html:'<div class="pin" style="border-color:#e11d48">大</div><div class="pl">大学</div>',iconSize:[34,34],iconAnchor:[17,17]})}).addTo(map)}
+L.marker(CAMPUS,{icon:L.divIcon({className:"",html:'<div class="pin" style="border-color:#e11d48">大</div><div class="pl">1号館</div>',iconSize:[34,34],iconAnchor:[17,17]})}).addTo(map);
+var currentMarker=null,currentAccuracy=null;
+function goCampus(){map.setView(CAMPUS,17);document.getElementById("locationStatus").textContent="1号館を表示中"}
+function goCurrent(){
+ var status=document.getElementById("locationStatus");
+ if(!navigator.geolocation){status.textContent="この端末では現在位置を取得できません";return}
+ status.textContent="現在位置を取得中…";
+ navigator.geolocation.getCurrentPosition(function(pos){
+  var point=[pos.coords.latitude,pos.coords.longitude];
+  if(currentMarker)map.removeLayer(currentMarker);
+  if(currentAccuracy)map.removeLayer(currentAccuracy);
+  currentMarker=L.marker(point,{icon:L.divIcon({className:"",html:'<div class="pin" style="border-color:#2563eb;background:#2563eb;color:#fff">今</div>',iconSize:[34,34],iconAnchor:[17,17]})}).addTo(map).bindTooltip("現在位置");
+  currentAccuracy=L.circle(point,{radius:pos.coords.accuracy,color:"#2563eb",fillColor:"#60a5fa",fillOpacity:.18,weight:1}).addTo(map);
+  map.setView(point,17);status.textContent="現在位置を表示中";
+ },function(error){
+  var message={1:"位置情報の許可が必要です",2:"現在位置を取得できません",3:"位置情報の取得がタイムアウトしました"}[error.code]||"現在位置を取得できません";
+  status.textContent=message;
+ },{enableHighAccuracy:true,timeout:10000,maximumAge:60000});
+}
+document.getElementById("campusBtn").onclick=goCampus;
+document.getElementById("locationBtn").onclick=goCurrent;
 function icon(s){var c="pin"+(st.sel===s.id?" sel":"")+(vis[s.id]?" vis":"")+(ok(s)?"":" dim");
  return L.divIcon({className:"",html:'<div class="'+c+'">'+s.id+'</div><div class="pl">'+SN[s.id]+'</div>',iconSize:[34,34],iconAnchor:[17,17]})}
 var mk={};
