@@ -15,13 +15,15 @@ main{max-width:1100px;margin:0 auto;padding:20px 16px 48px}
 h1{font-size:1.7rem;margin:0 0 4px;color:var(--accent)}
 .sub,.note,.meta{color:var(--muted);font-size:.88rem}
 .sub{margin:0 0 14px}
-.filters{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;align-items:end}
-@media(min-width:700px){.filters{grid-template-columns:repeat(3,1fr)}}
-@media(min-width:960px){.filters{grid-template-columns:repeat(6,auto);justify-content:start}}
-.filters label{display:flex;flex-direction:column;font-size:.8rem;color:var(--muted);gap:2px}
+.filters{display:grid;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.filter-group{display:flex;flex-direction:column;gap:7px}.filter-title{font-weight:700;font-size:.95rem}.filter-hint{color:var(--muted);font-size:.78rem}
+.choices{display:flex;flex-wrap:wrap;gap:7px}.choice{width:auto;min-height:40px;padding:6px 12px;border-radius:999px;background:var(--bg);transition:.15s}
+.choice:hover{border-color:var(--accent);transform:translateY(-1px)}.choice.active{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);font-weight:700}
+.filter-tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px;border-top:1px solid var(--line);padding-top:12px}
 .chk{flex-direction:row!important;align-items:center;gap:6px!important;font-size:.95rem!important;color:var(--fg)!important}
 select,button{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-height:44px;width:100%}
 .chk input{width:auto;min-height:0}
+#fw,#fs{width:auto;min-width:170px}.reset{width:auto;min-height:40px}
 #count{margin:14px 0 8px}
 .grid{display:grid;gap:14px;grid-template-areas:"map" "detail" "list"}
 @media(min-width:860px){.grid{grid-template-columns:1.2fr 1fr;grid-template-areas:"map detail" "map list";grid-template-rows:auto 1fr;align-items:start}}
@@ -57,22 +59,21 @@ textarea{width:100%;height:140px;font:12px/1.4 monospace;color:var(--fg);backgro
 </head>
 <body>
 <main>
-<h1>北千住ランチマップ（試作）</h1>
+<h1>北千住ランチマップ 🍽️</h1>
 <p class="sub">東京電機大学 東京千住キャンパスから歩ける、昼休みに食事ができる個人店・少数店舗の9店です。</p>
 <div class="filters">
-<label>予算（最安メニュー）<select id="fb"><option value="0">指定なし</option><option value="700">700円まで</option><option value="900">900円まで</option><option value="1100">1,100円まで</option><option value="1300">1,300円まで</option></select></label>
-<label>ジャンル<select id="fc"><option value="">すべて</option><option>和食</option><option>洋食</option><option>中華</option><option>韓国・弁当</option></select></label>
-<label>大学からの徒歩<select id="fw"><option value="0">指定なし</option><option value="3">3分以内</option><option value="4">4分以内</option></select></label>
-<label>並び替え<select id="fs"><option value="id">おすすめ順</option><option value="p">価格が安い順</option><option value="w">徒歩が近い順</option></select></label>
-<label class="chk"><input type="checkbox" id="fu"> まだ行っていない店だけ</label>
-<button id="rs" type="button">条件をリセット</button>
+<div class="filter-group"><span class="filter-title">今日は何を食べたい？</span><span class="filter-hint">気分に近いジャンルを選んでね</span><div class="choices" id="genreChoices">
+<button class="choice active" type="button" data-key="c" data-value="">🍽️ ぜんぶ</button><button class="choice" type="button" data-key="c" data-value="和食">🍚 和食</button><button class="choice" type="button" data-key="c" data-value="洋食">🍝 洋食</button><button class="choice" type="button" data-key="c" data-value="中華">🥟 中華</button><button class="choice" type="button" data-key="c" data-value="韓国・弁当">🥢 韓国・弁当</button></div></div>
+<div class="filter-group"><span class="filter-title">お財布の気分は？</span><span class="filter-hint">ランチの最安メニューで絞り込み</span><div class="choices" id="budgetChoices">
+<button class="choice active" type="button" data-key="b" data-value="0">💰 こだわらない</button><button class="choice" type="button" data-key="b" data-value="700">ワンコイン＋</button><button class="choice" type="button" data-key="b" data-value="900">〜900円</button><button class="choice" type="button" data-key="b" data-value="1100">〜1,100円</button><button class="choice" type="button" data-key="b" data-value="1300">〜1,300円</button></div></div>
+<div class="filter-tools"><label class="filter-title" for="fw">歩くならどこまで？</label><select id="fw"><option value="0">距離は気にしない</option><option value="3">徒歩3分以内</option><option value="4">徒歩4分以内</option></select><label class="chk"><input type="checkbox" id="fu"> 未訪問のお店だけ</label><label class="filter-title" for="fs">並び順</label><select id="fs"><option value="id">おすすめ順</option><option value="p">価格が安い順</option><option value="w">徒歩が近い順</option></select><button id="rs" class="reset" type="button">↺ 条件をリセット</button></div>
 </div>
 <div id="count" class="meta"></div>
 <div class="grid"><div id="map" role="region" aria-label="店舗の地図"></div><aside id="detail"></aside><div id="list"></div></div>
 <details><summary>閲覧ログ（試作の確認用）</summary>
 <p class="note">どの店のどの情報を見たかの記録の例です。このブラウザ内にだけ保存されます。</p>
 <textarea id="log" readonly></textarea><div class="btns"><button id="clr">ログを消す</button></div></details>
-<p class="note">試作版です。店舗情報は2026年11月3日時点の調査で、入口の写真は未掲載です。地図データ © OpenStreetMap contributors、地理院タイル</p>
+<p class="note">試作版です。店舗情報は2026年11月3日時点の調査で、入口の写真は未掲載です。地図データ © OpenStreetMap contributors</p>
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
@@ -103,9 +104,7 @@ function reportUrl(s){
 }
 var map=L.map("map").setView([35.7498,139.8063],17);
 var osm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,referrerPolicy:"strict-origin-when-cross-origin",attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
-var gsi=L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",{maxZoom:18,attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html">地理院タイル</a>'});
 osm.addTo(map);
-L.control.layers({"OpenStreetMap":osm,"地理院地図":gsi},null,{collapsed:false,position:"topright"}).addTo(map);
 map.fitBounds(S.map(function(s){return [s.lat,s.lng]}),{padding:[40,40],maxZoom:18});
 if(UNIV){L.marker(UNIV,{icon:L.divIcon({className:"",html:'<div class="pin" style="border-color:#e11d48">大</div><div class="pl">大学</div>',iconSize:[34,34],iconAnchor:[17,17]})}).addTo(map)}
 function icon(s){var c="pin"+(st.sel===s.id?" sel":"")+(vis[s.id]?" vis":"")+(ok(s)?"":" dim");
@@ -128,8 +127,9 @@ function render(){
 }
 document.getElementById("list").addEventListener("click",function(e){var el=e.target.closest("[data-id]");if(el)pick(+el.getAttribute("data-id"),true)});
 function bind(id,key,num){document.getElementById(id).onchange=function(){var v=this.type==="checkbox"?this.checked:(num?+this.value:this.value);st[key]=v;lg("filter",{key:key,value:v});render()}}
-bind("fb","b",1);bind("fc","c");bind("fw","w",1);bind("fu","u");bind("fs","o");
-document.getElementById("rs").onclick=function(){st.b=0;st.c="";st.w=0;st.u=false;st.o="id";document.getElementById("fb").value="0";document.getElementById("fc").value="";document.getElementById("fw").value="0";document.getElementById("fs").value="id";document.getElementById("fu").checked=false;lg("filter_reset");render()};
+document.querySelectorAll(".choice").forEach(function(el){el.onclick=function(){var key=el.getAttribute("data-key"),v=el.getAttribute("data-value");st[key]=key==="b"?+v:v;document.querySelectorAll('.choice[data-key="'+key+'"]').forEach(function(other){other.classList.toggle("active",other===el);other.setAttribute("aria-pressed",other===el?"true":"false")});lg("filter",{key:key,value:st[key]});render()}});
+bind("fw","w",1);bind("fu","u");bind("fs","o");
+document.getElementById("rs").onclick=function(){st.b=0;st.c="";st.w=0;st.u=false;st.o="id";document.getElementById("fw").value="0";document.getElementById("fs").value="id";document.getElementById("fu").checked=false;document.querySelectorAll(".choice").forEach(function(el){var active=el.getAttribute("data-value")===(el.getAttribute("data-key")==="b"?"0":"");el.classList.toggle("active",active);el.setAttribute("aria-pressed",active?"true":"false")});lg("filter_reset");render()};
 document.getElementById("clr").onclick=function(){logs=[];sv("logs",logs);document.getElementById("log").value=""};
 document.getElementById("log").value=logs.length?JSON.stringify(logs,null,1):"";
 render();
