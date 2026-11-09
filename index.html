@@ -101,6 +101,7 @@ var S=[
 {id:8,n:"さかなや いいとこ",g:"海鮮料理・和食",c:"和食",h:"11:30〜14:00",cl:"日曜・祝日",w:3,p:980,m:"いいとこ名物バラチラシ丼ランチ",mp:980,lat:35.749489,lng:139.807599},
 {id:9,n:"italianbar Sanire北千住店",g:"イタリアン・パスタ",c:"洋食",h:"11:00〜（通し営業）",cl:"不定休",w:4,p:700,m:"名物！黒いカルボナーラ",mp:1300,lat:35.749381,lng:139.808882}];
 var SN={1:"ここのつ",2:"REGALO",3:"ウエハラ",4:"マダムアン",5:"マルキン",6:"ALLORO",7:"五月家",8:"いいとこ",9:"Sanire"};
+var DISTANCE_ORDER=[6,5,7,4,3,8,2,1,9];
 var st={b:0,c:"",w:0,u:false,o:"id",sel:null},vis={},logs=[];
 function ld(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
@@ -108,7 +109,7 @@ vis=ld("vis",{});logs=ld("logs",[]);
 function lg(type,o){o=o||{};o.t=new Date().toISOString();o.type=type;logs.push(o);sv("logs",logs);document.getElementById("log").value=JSON.stringify(logs,null,1)}
 function yen(n){return n.toLocaleString("ja-JP")+"円"}
 function ok(s){return (!st.b||s.p<=st.b)&&(!st.c||s.c===st.c)&&(!st.w||s.w<=st.w)&&(!st.u||!vis[s.id])}
-function cmp(a,b){if(st.o==="p")return a.p-b.p;if(st.o==="w")return a.w-b.w||a.p-b.p;if(st.o==="g"&&st.c)return (a.c===st.c?0:1)-(b.c===st.c?0:1)||a.id-b.id;return a.id-b.id}
+function cmp(a,b){if(st.o==="p")return a.p-b.p;if(st.o==="w")return DISTANCE_ORDER.indexOf(a.id)-DISTANCE_ORDER.indexOf(b.id);if(st.o==="g"&&st.c)return (a.c===st.c?0:1)-(b.c===st.c?0:1)||a.id-b.id;return a.id-b.id}
 function find(id){return S.filter(function(s){return s.id===id})[0]}
 function reportUrl(s){
  var url="https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform?usp=pp_url";
