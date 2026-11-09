@@ -31,6 +31,7 @@ select,button{font:inherit;color:var(--fg);background:var(--bg);border:1px solid
 @media(min-width:860px){#map{height:78vh;position:sticky;top:12px}}
 #detail{grid-area:detail;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
 #list{grid-area:list}
+#list-title{margin:0 0 10px;font-size:1.15rem}#list-title small{display:block;color:var(--muted);font-size:.75rem;font-weight:400}
 #detail h2{margin:0 0 4px;font-size:1.35rem}
 .tag{display:inline-block;background:var(--soft);border-radius:6px;padding:0 8px;font-size:.78rem}
 .v{color:var(--ok);font-weight:700;font-size:.8rem;margin-left:8px}
@@ -44,6 +45,8 @@ a.btn{display:inline-block;text-decoration:none;border:1px solid var(--line);bor
 .off{opacity:.55}
 .card{display:flex;justify-content:space-between;gap:12px;align-items:center;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;min-height:0}
 .card.sel{outline:2px solid var(--accent)}
+.rank{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:26px;margin-right:6px;border-radius:999px;background:var(--soft);font-size:.82rem;font-weight:700;color:var(--accent)}
+.rank.gold{background:#fff0b3;color:#8a6200}.rank.silver{background:#e8edf2;color:#56616d}.rank.bronze{background:#f5dfc8;color:#8a5129}
 .card[data-c="和食"]{border-left-color:#c2410c}.card[data-c="洋食"]{border-left-color:#b91c4d}.card[data-c="中華"]{border-left-color:#b45309}.card[data-c="韓国・弁当"]{border-left-color:#6d28d9}
 .cl{min-width:0}.cr{text-align:right;flex:none}
 .pr{font-size:1.5rem;font-weight:700;color:var(--accent);line-height:1.1}.pr small{font-size:.75rem;font-weight:400;color:var(--muted)}
@@ -66,7 +69,7 @@ textarea{width:100%;height:140px;font:12px/1.4 monospace;color:var(--fg);backgro
 <button class="choice active" type="button" data-key="c" data-value="">🍽️ ぜんぶ</button><button class="choice" type="button" data-key="c" data-value="和食">🍚 和食</button><button class="choice" type="button" data-key="c" data-value="洋食">🍝 洋食</button><button class="choice" type="button" data-key="c" data-value="中華">🥟 中華</button><button class="choice" type="button" data-key="c" data-value="韓国・弁当">🥢 韓国・弁当</button></div></div>
 <div class="filter-group"><span class="filter-title">お財布の気分は？</span><span class="filter-hint">ランチの最安メニューで絞り込み</span><div class="choices" id="budgetChoices">
 <button class="choice active" type="button" data-key="b" data-value="0">💰 こだわらない</button><button class="choice" type="button" data-key="b" data-value="700">ワンコイン＋</button><button class="choice" type="button" data-key="b" data-value="900">〜900円</button><button class="choice" type="button" data-key="b" data-value="1100">〜1,100円</button><button class="choice" type="button" data-key="b" data-value="1300">〜1,300円</button></div></div>
-<div class="filter-tools"><label class="filter-title" for="fw">歩くならどこまで？</label><select id="fw"><option value="0">距離は気にしない</option><option value="3">徒歩3分以内</option><option value="4">徒歩4分以内</option></select><label class="chk"><input type="checkbox" id="fu"> 未訪問のお店だけ</label><label class="filter-title" for="fs">並び順</label><select id="fs"><option value="id">おすすめ順</option><option value="p">価格が安い順</option><option value="w">徒歩が近い順</option></select><button id="rs" class="reset" type="button">↺ 条件をリセット</button></div>
+<div class="filter-tools"><label class="filter-title" for="fw">歩くならどこまで？</label><select id="fw"><option value="0">距離は気にしない</option><option value="3">徒歩3分以内</option><option value="4">徒歩4分以内</option></select><label class="chk"><input type="checkbox" id="fu"> 未訪問のお店だけ</label><label class="filter-title" for="fs">並び順</label><select id="fs"><option value="id">🏆 おすすめランキング</option><option value="p">価格が安い順</option><option value="w">徒歩が近い順</option></select><button id="rs" class="reset" type="button">↺ 条件をリセット</button></div>
 </div>
 <div id="count" class="meta"></div>
 <div class="grid"><div id="map" role="region" aria-label="店舗の地図"></div><aside id="detail"></aside><div id="list"></div></div>
@@ -116,7 +119,8 @@ function pick(id,fromList){st.sel=id;var s=find(id);lg("open_detail",{store:s.n}
 function render(){
  var list=S.filter(ok).sort(cmp);
  document.getElementById("count").textContent=list.length+"店が条件に合います（全"+S.length+"店）";
- document.getElementById("list").innerHTML=list.length?list.map(function(s){return '<button class="card'+(st.sel===s.id?' sel':'')+'" data-c="'+s.c+'" data-id="'+s.id+'"><div class="cl"><b>'+s.id+'. '+s.n+'</b>'+(vis[s.id]?'<span class="v">✓ 行った</span>':'')+'<div class="meta">'+s.g+'</div><div class="meta">'+s.h+'　休み：'+s.cl+'</div></div><div class="cr"><div class="pr">'+s.p.toLocaleString("ja-JP")+'<small>円〜</small></div><div class="wk">徒歩'+s.w+'分</div></div></button>'}).join(""):'<p class="meta">条件に合う店がありません。条件をゆるめてください。</p>';
+ var title=st.o==="id"?'<h2 id="list-title">今日のおすすめランキング 🏆<small>条件に合うお店から、まずはここをチェック！</small></h2>':'<h2 id="list-title">お店一覧<small>並び順：'+(st.o==="p"?"価格が安い順":"徒歩が近い順")+'</small></h2>';
+ document.getElementById("list").innerHTML=title+(list.length?list.map(function(s,i){var rank=st.o==="id"&&i<3?'<span class="rank '+(i===0?"gold":i===1?"silver":"bronze")+'">'+(i===0?"🥇":i===1?"🥈":"🥉")+' '+(i+1)+"位</span>":"";return '<button class="card'+(st.sel===s.id?' sel':'')+'" data-c="'+s.c+'" data-id="'+s.id+'"><div class="cl"><b>'+rank+s.n+'</b>'+(vis[s.id]?'<span class="v">✓ 行った</span>':'')+'<div class="meta">'+s.g+'</div><div class="meta">'+s.h+'　休み：'+s.cl+'</div></div><div class="cr"><div class="pr">'+s.p.toLocaleString("ja-JP")+'<small>円〜</small></div><div class="wk">徒歩'+s.w+'分</div></div></button>'}).join(""):'<p class="meta">条件に合う店がありません。条件をゆるめてください。</p>');
  S.forEach(function(s){mk[s.id].setIcon(icon(s));mk[s.id].setZIndexOffset(st.sel===s.id?1000:0)});
  var D=document.getElementById("detail"),s=st.sel&&find(st.sel);
  if(!s){D.innerHTML='<p class="meta">地図のピンか、店の一覧を選ぶと、詳細が表示されます。</p>';return}
