@@ -24,6 +24,7 @@ h1{font-size:1.7rem;margin:0 0 4px;color:var(--accent)}
 .priority-choices{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.priority-choice{display:flex;flex-direction:column;align-items:flex-start;text-align:left;border-radius:12px;padding:10px 12px;line-height:1.35}.priority-choice strong{font-size:.92rem}.priority-choice small{font-size:.72rem;color:var(--muted);font-weight:400}.priority-choice.active small{color:inherit;opacity:.85}
 @media(max-width:600px){.priority-choices{grid-template-columns:repeat(2,1fr)}}
 .filter-tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px;border-top:1px solid var(--line);padding-top:12px}
+.distance-choices{display:flex;flex-wrap:wrap;gap:7px}.distance-choice{width:auto;min-height:40px;border-radius:999px}
 .chk{flex-direction:row!important;align-items:center;gap:6px!important;font-size:.95rem!important;color:var(--fg)!important}
 select,button{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-height:44px;width:100%}
 .chk input{width:auto;min-height:0}
@@ -76,9 +77,9 @@ textarea{width:100%;height:140px;font:12px/1.4 monospace;color:var(--fg);backgro
 <button class="choice active" type="button" data-key="c" data-value="">🍽️ なんでも</button><button class="choice" type="button" data-key="c" data-value="和食">🍚 和食</button><button class="choice" type="button" data-key="c" data-value="洋食">🍝 洋食</button><button class="choice" type="button" data-key="c" data-value="中華">🥟 中華</button><button class="choice" type="button" data-key="c" data-value="韓国・弁当">🥢 韓国・弁当</button></div></div>
 <div class="filter-group"><span class="filter-title">お財布の気分は？</span><span class="filter-hint">ランチの最安メニューで絞り込み</span><div class="choices" id="budgetChoices">
 <button class="choice active" type="button" data-key="b" data-value="0">💰 こだわらない</button><button class="choice" type="button" data-key="b" data-value="700">なるべく安く</button><button class="choice" type="button" data-key="b" data-value="900">〜900円</button><button class="choice" type="button" data-key="b" data-value="1100">〜1,100円</button><button class="choice" type="button" data-key="b" data-value="1300">〜1,300円</button></div></div>
-<div class="filter-group"><span class="filter-title">どんな決め手で選ぶ？</span><span class="filter-hint">気になる提案を選ぶと、ランキングの基準が変わります</span><div class="choices priority-choices" id="priorityChoices">
-<button class="choice priority-choice active" type="button" data-key="o" data-value="id"><strong>🏆 迷ったらおすすめ</strong><small>いろいろな条件のバランス</small></button><button class="choice priority-choice" type="button" data-key="o" data-value="p"><strong>💰 お財布で決める</strong><small>できるだけ安く</small></button><button class="choice priority-choice" type="button" data-key="o" data-value="g"><strong>🍝 食べたいもので決める</strong><small>選んだジャンルを優先</small></button><button class="choice priority-choice" type="button" data-key="o" data-value="w"><strong>🚶 近さで決める</strong><small>昼休みをゆったり</small></button></div></div>
-<div class="filter-tools"><label class="filter-title" for="fw">歩くならどこまで？</label><select id="fw"><option value="0">距離は気にしない</option><option value="3">徒歩3分以内</option><option value="4">徒歩4分以内</option></select><label class="chk"><input type="checkbox" id="fu"> 未訪問のお店だけ</label><button id="rs" class="reset" type="button">↺ 条件をリセット</button></div>
+<div class="filter-group" id="priorityGroup"><span class="filter-title">どんな決め手で選ぶ？</span><span class="filter-hint">気になる提案を選ぶと、ランキングの基準が変わります</span><div class="choices priority-choices" id="priorityChoices">
+<button class="choice priority-choice" type="button" data-key="o" data-value="w"><strong>🚶 近さで決める</strong><small>昼休みをゆったり</small></button><button class="choice priority-choice" type="button" data-key="o" data-value="p"><strong>💰 お財布で決める</strong><small>できるだけ安く</small></button></div></div>
+<div class="filter-tools"><span class="filter-title">歩くならどこまで？</span><div class="distance-choices"><button class="choice distance-choice" type="button" data-key="w" data-value="3">徒歩3分以内</button><button class="choice distance-choice" type="button" data-key="w" data-value="4">徒歩4分以内</button></div><label class="chk"><input type="checkbox" id="fu"> 未訪問のお店だけ</label><button id="rs" class="reset" type="button">↺ 条件をリセット</button></div>
 </div>
 <div id="count" class="meta"></div>
 <div class="grid"><div><div id="map" role="region" aria-label="店舗の地図"></div><div class="map-actions"><button id="campusBtn" type="button">🏫 1号館に戻る</button><button id="locationBtn" type="button">📍 現在位置に戻る</button><span id="locationStatus" class="location-status" role="status"></span></div></div><aside id="detail"></aside><div id="list"></div></div>
@@ -110,6 +111,7 @@ function lg(type,o){o=o||{};o.t=new Date().toISOString();o.type=type;logs.push(o
 function yen(n){return n.toLocaleString("ja-JP")+"円"}
 function ok(s){return (!st.b||s.p<=st.b)&&(!st.c||s.c===st.c)&&(!st.w||s.w<=st.w)&&(!st.u||!vis[s.id])}
 function cmp(a,b){if(st.o==="p")return a.p-b.p;if(st.o==="w")return DISTANCE_ORDER.indexOf(a.id)-DISTANCE_ORDER.indexOf(b.id);if(st.o==="g"&&st.c)return (a.c===st.c?0:1)-(b.c===st.c?0:1)||a.id-b.id;return a.id-b.id}
+function updatePriorityVisibility(){document.getElementById("priorityGroup").hidden=st.b!==0}
 function find(id){return S.filter(function(s){return s.id===id})[0]}
 function reportUrl(s){
  var url="https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform?usp=pp_url";
@@ -149,7 +151,7 @@ function render(){
  var list=S.filter(ok).sort(cmp);
  document.getElementById("count").textContent=list.length+"店が条件に合います（全"+S.length+"店）";
  var reason=st.o==="id"?"価格・ジャンル・距離のバランスで提案":st.o==="p"?"お財布にやさしい順で提案":st.o==="w"?"大学から近い順で提案":st.c?"選んだジャンルを優先して提案":"ジャンルを選ぶと、そのジャンルを優先して提案";
- var title='<h2 id="list-title">'+(st.o==="id"?"迷ったらおすすめ":st.o==="p"?"お財布で決める":st.o==="w"?"近さで決める":"食べたいもので決める")+'ランキング 🏆<small>'+reason+'</small></h2>';
+ var title='<h2 id="list-title">'+(st.o==="id"?"おすすめ":st.o==="p"?"お財布で決める":st.o==="w"?"近さで決める":"おすすめ")+'ランキング 🏆<small>'+reason+'</small></h2>';
  document.getElementById("list").innerHTML=title+(list.length?list.map(function(s,i){var rank=i<3?'<span class="rank '+(i===0?"gold":i===1?"silver":"bronze")+'">'+(i===0?"🥇":i===1?"🥈":"🥉")+' '+(i+1)+"位</span>":"";return '<button class="card'+(st.sel===s.id?' sel':'')+'" data-c="'+s.c+'" data-id="'+s.id+'"><div class="cl"><b>'+rank+s.n+'</b>'+(vis[s.id]?'<span class="v">✓ 行った</span>':'')+'<div class="meta">'+s.g+'</div><div class="meta">'+s.h+'　休み：'+s.cl+'</div></div><div class="cr"><div class="pr">'+s.p.toLocaleString("ja-JP")+'<small>円〜</small></div><div class="wk">徒歩'+s.w+'分</div></div></button>'}).join(""):'<p class="meta">条件に合う店がありません。条件をゆるめてください。</p>');
  S.forEach(function(s){mk[s.id].setIcon(icon(s));mk[s.id].setZIndexOffset(st.sel===s.id?1000:0)});
  var D=document.getElementById("detail"),s=st.sel&&find(st.sel);
@@ -161,11 +163,12 @@ function render(){
 }
 document.getElementById("list").addEventListener("click",function(e){var el=e.target.closest("[data-id]");if(el)pick(+el.getAttribute("data-id"),true)});
 function bind(id,key,num){document.getElementById(id).onchange=function(){var v=this.type==="checkbox"?this.checked:(num?+this.value:this.value);st[key]=v;lg("filter",{key:key,value:v});render()}}
-document.querySelectorAll(".choice").forEach(function(el){el.onclick=function(){var key=el.getAttribute("data-key"),v=el.getAttribute("data-value");st[key]=key==="b"?+v:v;document.querySelectorAll('.choice[data-key="'+key+'"]').forEach(function(other){other.classList.toggle("active",other===el);other.setAttribute("aria-pressed",other===el?"true":"false")});lg(key==="o"?"priority_selected":"filter",{key:key,value:st[key]});render()}});
-bind("fw","w",1);bind("fu","u");
-document.getElementById("rs").onclick=function(){st.b=0;st.c="";st.w=0;st.u=false;st.o="id";document.getElementById("fw").value="0";document.getElementById("fu").checked=false;document.querySelectorAll(".choice").forEach(function(el){var active=el.getAttribute("data-value")===(el.getAttribute("data-key")==="b"?"0":el.getAttribute("data-key")==="o"?"id":"");el.classList.toggle("active",active);el.setAttribute("aria-pressed",active?"true":"false")});lg("filter_reset");render()};
+document.querySelectorAll(".choice").forEach(function(el){el.onclick=function(){var key=el.getAttribute("data-key"),v=el.getAttribute("data-value");st[key]=(key==="b"||key==="w")?+v:v;document.querySelectorAll('.choice[data-key="'+key+'"]').forEach(function(other){other.classList.toggle("active",other===el);other.setAttribute("aria-pressed",other===el?"true":"false")});if(key==="b"){st.o="id";document.querySelectorAll('.choice[data-key="o"]').forEach(function(other){other.classList.remove("active");other.setAttribute("aria-pressed","false")})}lg(key==="o"?"priority_selected":"filter",{key:key,value:st[key]});updatePriorityVisibility();render()}});
+bind("fu","u");
+document.getElementById("rs").onclick=function(){st.b=0;st.c="";st.w=0;st.u=false;st.o="id";document.getElementById("fu").checked=false;document.querySelectorAll(".choice").forEach(function(el){var key=el.getAttribute("data-key"),active=(key==="b"&&el.getAttribute("data-value")==="0");el.classList.toggle("active",active);el.setAttribute("aria-pressed",active?"true":"false")});updatePriorityVisibility();lg("filter_reset");render()};
 document.getElementById("clr").onclick=function(){logs=[];sv("logs",logs);document.getElementById("log").value=""};
 document.getElementById("log").value=logs.length?JSON.stringify(logs,null,1):"";
+updatePriorityVisibility();
 render();
 </script>
 </body>
