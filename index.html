@@ -43,6 +43,7 @@ select,button{font:inherit;color:var(--fg);background:var(--bg);border:1px solid
 @media(min-width:860px){#map{height:78vh;position:sticky;top:12px}}
 .map-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.map-heading strong{font-size:1.05rem}.map-heading span{color:var(--muted);font-size:.76rem}
 .map-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.map-actions button{width:auto;min-height:40px}.location-status{color:var(--muted);font-size:.8rem}
+.map-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;color:var(--muted);font-size:.75rem}.map-legend span{display:inline-flex;align-items:center;gap:4px}.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
 #detail{grid-area:detail;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)}
 #list{grid-area:list}
 #list-title{margin:0 0 10px;font-size:1.15rem}#list-title small{display:block;color:var(--muted);font-size:.75rem;font-weight:400}
@@ -90,7 +91,7 @@ textarea{width:100%;height:140px;font:12px/1.4 monospace;color:var(--fg);backgro
 <div class="filter-tools"><button id="rs" class="reset" type="button">↺ 条件をリセット</button></div>
 </div>
 <div id="count" class="meta"></div>
-<div class="grid"><div><div class="map-heading"><strong>📍 お店の位置</strong><span>1号館からの距離をチェック</span></div><div id="map" role="region" aria-label="店舗の地図"></div><div class="map-actions"><button id="campusBtn" type="button">🏫 1号館に戻る</button><button id="locationBtn" type="button">📍 現在位置に戻る</button><span id="locationStatus" class="location-status" role="status"></span></div></div><aside id="detail"></aside><div id="list"></div></div>
+<div class="grid"><div><div class="map-heading"><strong>📍 お店の位置</strong><span>ピンを押すとおすすめ理由を表示</span></div><div id="map" role="region" aria-label="店舗の地図"></div><div class="map-actions"><button id="campusBtn" type="button">🏫 1号館に戻る</button><button id="locationBtn" type="button">📍 現在位置に戻る</button><span id="locationStatus" class="location-status" role="status"></span></div><div class="map-legend"><span><i class="legend-dot" style="background:#c2410c"></i>米・和食</span><span><i class="legend-dot" style="background:#b91c4d"></i>洋食</span><span><i class="legend-dot" style="background:#b45309"></i>中華</span><span><i class="legend-dot" style="background:#6d28d9"></i>韓国・弁当</span></div></div><aside id="detail"></aside><div id="list"></div></div>
 <details><summary>閲覧ログ（試作の確認用）</summary>
 <p class="note">どの店のどの情報を見たかの記録の例です。このブラウザ内にだけ保存されます。</p>
 <textarea id="log" readonly></textarea><div class="btns"><button id="clr">ログを消す</button></div></details>
@@ -120,7 +121,7 @@ function yen(n){return n.toLocaleString("ja-JP")+"円"}
 function ok(s){return (!st.b||s.p<=st.b)&&(!st.c||(st.c==="rice"?s.c!=="洋食":s.c===st.c))&&(!st.w||s.w<=st.w)&&(!st.u||!vis[s.id])}
 function cmp(a,b){if(st.o==="p")return a.p-b.p;if(st.o==="w")return DISTANCE_ORDER.indexOf(a.id)-DISTANCE_ORDER.indexOf(b.id);if(st.o==="g"&&st.c)return (a.c===st.c?0:1)-(b.c===st.c?0:1)||a.id-b.id;return a.id-b.id}
 function updatePriorityVisibility(){var visible=broadFiltersChosen.b&&broadFiltersChosen.c&&st.b===0&&st.c==="";document.getElementById("priorityGroup").hidden=!visible;if(visible&&st.o==="id"){st.o="w";document.querySelectorAll('.choice[data-key="o"]').forEach(function(el){var active=el.getAttribute("data-value")==="w";el.classList.toggle("active",active);el.setAttribute("aria-pressed",active?"true":"false")})}}
-function pickRandom(){var s=S[Math.floor(Math.random()*S.length)];st.sel=s.id;randomChoice=true;lg("random_pick",{store:s.n});render();map.panTo([s.lat,s.lng]);document.getElementById("detail").scrollIntoView({behavior:"smooth",block:"start"})}
+function pickRandom(){var s=S[Math.floor(Math.random()*S.length)];st.sel=s.id;randomChoice=true;lg("random_pick",{store:s.n});render();showRoute(s);map.panTo([s.lat,s.lng]);document.getElementById("detail").scrollIntoView({behavior:"smooth",block:"start"})}
 function find(id){return S.filter(function(s){return s.id===id})[0]}
 function reportUrl(s){
  var url="https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform?usp=pp_url";
@@ -130,7 +131,7 @@ var map=L.map("map").setView(CAMPUS,17);
 var osm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,referrerPolicy:"strict-origin-when-cross-origin",attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
 osm.addTo(map);
 L.marker(CAMPUS,{icon:L.divIcon({className:"",html:'<div class="pin" style="border-color:#e11d48">大</div><div class="pl">1号館</div>',iconSize:[34,34],iconAnchor:[17,17]})}).addTo(map);
-var currentMarker=null,currentAccuracy=null;
+var currentMarker=null,currentAccuracy=null,routeLine=null;
 function goCampus(){map.setView(CAMPUS,17);document.getElementById("locationStatus").textContent="1号館を表示中"}
 function goCurrent(){
  var status=document.getElementById("locationStatus");
@@ -148,13 +149,20 @@ function goCurrent(){
   status.textContent=message;
  },{enableHighAccuracy:true,timeout:10000,maximumAge:60000});
 }
+function showRoute(s){
+ if(routeLine)map.removeLayer(routeLine);
+ routeLine=L.polyline([CAMPUS,[s.lat,s.lng]],{color:"#e11d48",weight:4,dashArray:"8 8",opacity:.75}).addTo(map);
+}
+function genreColor(s){return {和食:"#c2410c",洋食:"#b91c4d",中華:"#b45309","韓国・弁当":"#6d28d9"}[s.c]||"#1f6f8b"}
 document.getElementById("campusBtn").onclick=goCampus;
 document.getElementById("locationBtn").onclick=goCurrent;
 function icon(s){var c="pin"+(st.sel===s.id?" sel":"")+(vis[s.id]?" vis":"")+(ok(s)?"":" dim");
- return L.divIcon({className:"",html:'<div class="'+c+'">'+s.id+'</div><div class="pl">'+SN[s.id]+'</div>',iconSize:[34,34],iconAnchor:[17,17]})}
+ return L.divIcon({className:"",html:'<div class="'+c+'" style="border-color:'+genreColor(s)+'">'+s.id+'</div><div class="pl">'+SN[s.id]+'</div>',iconSize:[34,34],iconAnchor:[17,17]})}
 var mk={};
+var densityLayer=L.layerGroup().addTo(map);
+S.forEach(function(s){L.circle([s.lat,s.lng],{radius:45,color:genreColor(s),weight:1,fillColor:genreColor(s),fillOpacity:.08,opacity:.22,interactive:false}).addTo(densityLayer)});
 S.forEach(function(s){mk[s.id]=L.marker([s.lat,s.lng],{icon:icon(s),title:s.n}).addTo(map).on("click",function(){pick(s.id,false)})});
-function pick(id,fromList){st.sel=id;randomChoice=false;var s=find(id);lg("open_detail",{store:s.n});render();map.panTo([s.lat,s.lng]);
+function pick(id,fromList){st.sel=id;randomChoice=false;var s=find(id);lg("open_detail",{store:s.n});render();showRoute(s);map.panTo([s.lat,s.lng]);
  if(fromList&&window.innerWidth<860){document.getElementById("detail").scrollIntoView({behavior:"smooth",block:"start"})}}
 function render(){
  var list=S.filter(ok).sort(cmp);
