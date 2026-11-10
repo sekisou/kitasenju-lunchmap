@@ -7,21 +7,25 @@
 <title>北千住ランチマップ（試作）</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
-:root{--bg:#f6f5f0;--fg:#1f2a37;--muted:#5b6570;--card:#fff;--line:#dfe3e6;--accent:#1f6f8b;--accent-fg:#fff;--soft:#e6f0f3;--ok:#2e7d4f;color-scheme:light dark}
+:root{--bg:#f7f4ed;--fg:#1f2a37;--muted:#5b6570;--card:#fff;--line:#e4e0d8;--accent:#1f6f8b;--accent-fg:#fff;--soft:#e6f0f3;--ok:#2e7d4f;--warm:#f59e0b;--shadow:0 10px 24px rgba(31,42,55,.09);color-scheme:light dark}
 @media (prefers-color-scheme:dark){:root{--bg:#161a1e;--fg:#e8ecef;--muted:#9aa5af;--card:#20262b;--line:#343c43;--accent:#6bb8d1;--accent-fg:#0f1a20;--soft:#1f323a;--ok:#4fae78}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 "Noto Sans JP","Hiragino Sans",Meiryo,sans-serif}
+body{margin:0;background:radial-gradient(circle at 90% 0,#e6f0f3 0,transparent 30%),var(--bg);color:var(--fg);font:17px/1.6 "Noto Sans JP","Hiragino Sans",Meiryo,sans-serif}
 main{max-width:1100px;margin:0 auto;padding:20px 16px 48px}
-h1{font-size:1.7rem;margin:0 0 4px;color:var(--accent)}
+.hero{position:relative;overflow:hidden;margin-bottom:16px;padding:24px 24px 20px;background:linear-gradient(130deg,#1f6f8b,#155267);border-radius:22px;color:#fff;box-shadow:var(--shadow)}
+.hero:after{content:"🍜";position:absolute;right:24px;bottom:-16px;font-size:7rem;opacity:.16;transform:rotate(-12deg)}
+h1{position:relative;z-index:1;font-size:clamp(1.7rem,4vw,2.4rem);line-height:1.25;margin:0 0 6px;color:#fff}
+.hero .sub{position:relative;z-index:1;max-width:680px;margin:0;color:rgba(255,255,255,.86)}
+.hero-stats{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.hero-stats span{padding:4px 10px;border:1px solid rgba(255,255,255,.35);border-radius:999px;background:rgba(255,255,255,.12);font-size:.78rem}
 .sub,.note,.meta{color:var(--muted);font-size:.88rem}
 .sub{margin:0 0 14px}
 .other-report{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:12px 14px;background:var(--soft);border:1px solid var(--line);border-radius:12px}
 .other-report p{margin:0;font-size:.9rem}.other-report .btn{flex:none;padding:8px 12px;font-weight:700}
 .unvisited-prompt{display:flex;align-items:center;gap:10px;margin:0 0 14px;padding:12px 14px;background:#fff8df;border:1px solid #efd98a;border-radius:12px}
 .unvisited-prompt input{width:20px;height:20px;flex:none}.unvisited-prompt label{cursor:pointer}.unvisited-prompt strong{display:block;font-size:.95rem}.unvisited-prompt small{display:block;color:var(--muted);font-size:.78rem}
-.filters{display:grid;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.filters{display:grid;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
 .filter-group{display:flex;flex-direction:column;gap:7px}.filter-group[hidden]{display:none!important}.filter-title{font-weight:700;font-size:.95rem}.filter-hint{color:var(--muted);font-size:.78rem}
-.random-pick{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#fff0f5;border:1px solid #f1bfd0;border-radius:12px}.random-pick p{margin:0;font-size:.9rem}.random-pick small{display:block;color:var(--muted);font-size:.76rem}.random-pick button{width:auto;min-height:40px;background:#e11d48;color:#fff;border-color:#e11d48;font-weight:700;white-space:nowrap}
+.random-pick{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:linear-gradient(100deg,#fff0f5,#fff7ed);border:1px solid #f1bfd0;border-radius:14px;box-shadow:var(--shadow)}.random-pick p{margin:0;font-size:.95rem}.random-pick small{display:block;color:var(--muted);font-size:.76rem}.random-pick button{width:auto;min-height:42px;background:#e11d48;color:#fff;border-color:#e11d48;font-weight:700;white-space:nowrap;box-shadow:0 4px 0 #b5163a;transition:.15s}.random-pick button:hover{transform:translateY(-2px);box-shadow:0 6px 0 #b5163a}
 .choices{display:flex;flex-wrap:wrap;gap:7px}.choice{width:auto;min-height:40px;padding:6px 12px;border-radius:999px;background:var(--bg);transition:.15s}
 .choice:hover{border-color:var(--accent);transform:translateY(-1px)}.choice.active{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);font-weight:700}
 .priority-choices{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.priority-choice{display:flex;flex-direction:column;align-items:flex-start;text-align:left;border-radius:12px;padding:10px 12px;line-height:1.35}.priority-choice strong{font-size:.92rem}.priority-choice small{font-size:.72rem;color:var(--muted);font-weight:400}.priority-choice.active small{color:inherit;opacity:.85}
@@ -35,10 +39,11 @@ select,button{font:inherit;color:var(--fg);background:var(--bg);border:1px solid
 .grid{display:grid;gap:14px;grid-template-areas:"map" "detail" "list"}
 .grid>div:first-child{grid-area:map}
 @media(min-width:860px){.grid{grid-template-columns:1.2fr 1fr;grid-template-areas:"map detail" "map list";grid-template-rows:auto 1fr;align-items:start}}
-#map{grid-area:map;height:46vh;min-height:300px;border:1px solid var(--line);border-radius:12px;font-family:inherit}
+#map{grid-area:map;height:46vh;min-height:300px;border:1px solid var(--line);border-radius:14px;font-family:inherit;overflow:hidden;box-shadow:var(--shadow)}
 @media(min-width:860px){#map{height:78vh;position:sticky;top:12px}}
+.map-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.map-heading strong{font-size:1.05rem}.map-heading span{color:var(--muted);font-size:.76rem}
 .map-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.map-actions button{width:auto;min-height:40px}.location-status{color:var(--muted);font-size:.8rem}
-#detail{grid-area:detail;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+#detail{grid-area:detail;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)}
 #list{grid-area:list}
 #list-title{margin:0 0 10px;font-size:1.15rem}#list-title small{display:block;color:var(--muted);font-size:.75rem;font-weight:400}
 #detail h2{margin:0 0 4px;font-size:1.35rem}
@@ -52,8 +57,8 @@ dl{display:grid;grid-template-columns:7.5em 1fr;gap:4px 8px;margin:8px 0;font-si
 .pri{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);font-weight:700}
 a.btn{display:inline-block;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:10px;color:var(--fg);background:var(--bg)}
 .off{opacity:.55}
-.card{display:flex;justify-content:space-between;gap:12px;align-items:center;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;min-height:0}
-.card.sel{outline:2px solid var(--accent)}
+.card{display:flex;justify-content:space-between;gap:12px;align-items:center;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:14px;padding:15px 16px;margin-bottom:10px;cursor:pointer;min-height:0;box-shadow:0 4px 12px rgba(31,42,55,.05);transition:.15s}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}.card.sel{outline:2px solid var(--accent)}
 .rank{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:26px;margin-right:6px;border-radius:999px;background:var(--soft);font-size:.82rem;font-weight:700;color:var(--accent)}
 .rank.gold{background:#fff0b3;color:#8a6200}.rank.silver{background:#e8edf2;color:#56616d}.rank.bronze{background:#f5dfc8;color:#8a5129}
 .card[data-c="和食"]{border-left-color:#c2410c}.card[data-c="洋食"]{border-left-color:#b91c4d}.card[data-c="中華"]{border-left-color:#b45309}.card[data-c="韓国・弁当"]{border-left-color:#6d28d9}
@@ -65,14 +70,13 @@ a.btn{display:inline-block;text-decoration:none;border:1px solid var(--line);bor
 .pin.sel{border-color:#e11d48;transform:scale(1.2)}
 .pin.dim{opacity:.3}
 .pl{position:absolute;top:37px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px;font-weight:700;color:#1f2a37;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff}
-details{margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+details{margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;box-shadow:var(--shadow)}
 textarea{width:100%;height:140px;font:12px/1.4 monospace;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px}
 </style>
 </head>
 <body>
 <main>
-<h1>北千住ランチマップ 🍽️</h1>
-<p class="sub">東京電機大学 東京千住キャンパスから歩ける、昼休みに食事ができる個人店・少数店舗の9店です。</p>
+<header class="hero"><h1>北千住ランチマップ 🍽️</h1><p class="sub">今日の昼休みを、いつもよりちょっと楽しく。</p><div class="hero-stats"><span>東京千住キャンパスから徒歩圏内</span><span>厳選9店舗</span><span>写真・価格・営業時間つき</span></div></header>
 <div class="other-report"><p>対象店舗以外で昼食をとった方や学食や弁当、または昼食をとらなかった方等はこちら</p><a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform?usp=pp_url&amp;entry.273635376=P1&amp;entry.2072569150=2026-11-10&amp;entry.1368935237=%E5%AF%BE%E8%B1%A1%E5%BA%97%E8%88%97%E4%BB%A5%E5%A4%96&amp;entry.270935127=%E3%81%84%E3%81%84%E3%81%88&amp;entry.1703917794=%E6%9C%AC%E3%82%A2%E3%83%97%E3%83%AA%E3%82%92%E8%A6%8B%E3%81%A6&amp;entry.1528988745=%E4%BE%A1%E6%A0%BC&amp;entry.1552917334=800" target="_blank" rel="noopener">対象店舗以外の方はこちら</a></div>
 <div class="unvisited-prompt"><input type="checkbox" id="fu"><label for="fu"><strong>他のお店にも行ってみませんか？</strong><small>チェックすると、まだ訪問していないお店だけを表示します。</small></label></div>
 <div class="random-pick"><p><strong>まだお店が決まらない？</strong><small>条件を決めずに、9店舗から今日の1店を選びます。</small></p><button id="randomPick" type="button">🎲 これを押して！</button></div>
@@ -86,7 +90,7 @@ textarea{width:100%;height:140px;font:12px/1.4 monospace;color:var(--fg);backgro
 <div class="filter-tools"><button id="rs" class="reset" type="button">↺ 条件をリセット</button></div>
 </div>
 <div id="count" class="meta"></div>
-<div class="grid"><div><div id="map" role="region" aria-label="店舗の地図"></div><div class="map-actions"><button id="campusBtn" type="button">🏫 1号館に戻る</button><button id="locationBtn" type="button">📍 現在位置に戻る</button><span id="locationStatus" class="location-status" role="status"></span></div></div><aside id="detail"></aside><div id="list"></div></div>
+<div class="grid"><div><div class="map-heading"><strong>📍 お店の位置</strong><span>1号館からの距離をチェック</span></div><div id="map" role="region" aria-label="店舗の地図"></div><div class="map-actions"><button id="campusBtn" type="button">🏫 1号館に戻る</button><button id="locationBtn" type="button">📍 現在位置に戻る</button><span id="locationStatus" class="location-status" role="status"></span></div></div><aside id="detail"></aside><div id="list"></div></div>
 <details><summary>閲覧ログ（試作の確認用）</summary>
 <p class="note">どの店のどの情報を見たかの記録の例です。このブラウザ内にだけ保存されます。</p>
 <textarea id="log" readonly></textarea><div class="btns"><button id="clr">ログを消す</button></div></details>
