@@ -73,6 +73,10 @@ a.btn{display:inline-block;text-decoration:none;border:1px solid var(--line);bor
 .pl{position:absolute;top:37px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px;font-weight:700;color:#1f2a37;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff}
 details{margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;box-shadow:var(--shadow)}
 textarea{width:100%;height:140px;font:12px/1.4 monospace;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px}
+.lunch-plans{margin:18px 0 20px;padding:20px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.section-heading{margin-bottom:13px}.eyebrow{color:var(--accent);font-size:.7rem;font-weight:800;letter-spacing:.14em}.section-heading h2{margin:2px 0 0;font-size:1.35rem}.section-heading p{margin:2px 0 0;color:var(--muted);font-size:.82rem}
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.plan-card{display:flex;align-items:flex-start;flex-direction:column;min-height:132px;padding:15px;text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--bg);transition:.15s}.plan-card:hover{transform:translateY(-2px);border-color:var(--accent)}.plan-icon{font-size:1.8rem;line-height:1}.plan-title{margin-top:12px;font-weight:800}.plan-text{margin-top:2px;color:var(--muted);font-size:.78rem}.plan-card.near{border-top:4px solid #2e7d4f}.plan-card.new{border-top:4px solid #c2410c}.plan-card.adventure{border-top:4px solid #e11d48}
+.plan-result{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:10px 12px;background:var(--soft);border-radius:9px;color:var(--accent)}.plan-result span{font-size:1.3rem}.plan-result small{color:var(--muted);font-size:.76rem}
 body{background:var(--bg);font-size:16px}
 main{max-width:1180px;padding:24px 20px 56px}
 .hero{margin-bottom:20px;padding:28px 30px 24px;border-radius:16px;box-shadow:none}
@@ -119,6 +123,11 @@ details{box-shadow:none}
  .random-pick{align-items:stretch;flex-direction:column}
  .random-pick button{width:100%}
  .filters{padding:16px}
+ .lunch-plans{padding:16px}
+ .plan-grid{grid-template-columns:1fr}
+ .plan-card{min-height:0;padding:13px;display:grid;grid-template-columns:38px 1fr;grid-template-rows:auto auto;column-gap:8px}
+ .plan-icon{grid-row:1 / span 2}
+ .plan-title{margin-top:0}
  .choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
  .choice{width:100%;padding-inline:8px}
  .priority-choices{display:grid}
@@ -137,6 +146,14 @@ details{box-shadow:none}
 <div class="other-report"><p>対象店舗以外で昼食をとった方や学食や弁当、または昼食をとらなかった方等はこちら</p><a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform" target="_blank" rel="noopener">対象店舗以外の方はこちら</a></div>
 <div class="unvisited-prompt"><input type="checkbox" id="fu"><label for="fu"><strong>他のお店にも行ってみませんか？</strong><small>チェックすると、まだ訪問していないお店だけを表示します。</small></label></div>
 <div class="random-pick"><p><strong>まだお店が決まらない？</strong><small>条件を決めずに、9店舗から今日の1店を選びます。</small></p><button id="randomPick" type="button">🎲 これを押して！</button></div>
+<section class="lunch-plans" aria-labelledby="plans-title">
+<div class="section-heading"><span class="eyebrow">CHOOSE YOUR LUNCH</span><h2 id="plans-title">今日のランチ作戦</h2><p>条件を決める前に、今日の気分で選べます。</p></div>
+<div class="plan-grid">
+<button class="plan-card near" type="button" data-plan="near"><span class="plan-icon">🚶</span><span class="plan-title">近場で確実</span><span class="plan-text">昼休みをゆったり使う</span></button>
+<button class="plan-card new" type="button" data-plan="new"><span class="plan-icon">🌱</span><span class="plan-title">新しい店へ</span><span class="plan-text">まだ行っていない店を開拓</span></button>
+<button class="plan-card adventure" type="button" data-plan="adventure"><span class="plan-icon">🎲</span><span class="plan-title">今日は冒険</span><span class="plan-text">偶然の出会いを楽しむ</span></button>
+</div>
+</section>
 <div class="filters">
 <div class="filter-group"><span class="filter-title">今日は何を食べたい？</span><span class="filter-hint">気分に近いジャンルを選んでね</span><div class="choices" id="genreChoices">
 <button class="choice active" type="button" data-key="c" data-value="">🍽️ なんでも</button><button class="choice" type="button" data-key="c" data-value="rice">🍚 米・和食</button><button class="choice" type="button" data-key="c" data-value="洋食">🍝 洋食</button></div></div>
@@ -168,7 +185,7 @@ var S=[
 {id:9,n:"italianbar Sanire北千住店",g:"イタリアン・パスタ",c:"洋食",h:"11:00〜（通し営業）",cl:"不定休",w:4,p:700,m:"名物！黒いカルボナーラ",mp:1300,lat:35.749381,lng:139.808882}];
 var SN={1:"ここのつ",2:"REGALO",3:"ウエハラ",4:"マダムアン",5:"マルキン",6:"ALLORO",7:"五月家",8:"いいとこ",9:"Sanire"};
 var DISTANCE_ORDER=[6,5,7,4,3,8,2,1,9];
-var st={b:0,c:"",w:0,u:false,o:"id",sel:null},vis={},logs=[],broadFiltersChosen={b:false,c:false},randomChoice=false;
+var st={b:0,c:"",w:0,u:false,o:"id",sel:null},vis={},logs=[],broadFiltersChosen={b:false,c:false},randomChoice=false,planChoice="";
 function ld(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 vis=ld("vis",{});logs=ld("logs",[]);
@@ -177,7 +194,15 @@ function yen(n){return n.toLocaleString("ja-JP")+"円"}
 function ok(s){return (!st.b||s.p<=st.b)&&(!st.c||(st.c==="rice"?s.c!=="洋食":s.c===st.c))&&(!st.w||s.w<=st.w)&&(!st.u||!vis[s.id])}
 function cmp(a,b){if(st.o==="p")return a.p-b.p;if(st.o==="w")return DISTANCE_ORDER.indexOf(a.id)-DISTANCE_ORDER.indexOf(b.id);if(st.o==="g"&&st.c)return (a.c===st.c?0:1)-(b.c===st.c?0:1)||a.id-b.id;return a.id-b.id}
 function updatePriorityVisibility(){var visible=broadFiltersChosen.b&&broadFiltersChosen.c&&st.b===0&&st.c==="";document.getElementById("priorityGroup").hidden=!visible;if(visible&&st.o==="id"){st.o="w";document.querySelectorAll('.choice[data-key="o"]').forEach(function(el){var active=el.getAttribute("data-value")==="w";el.classList.toggle("active",active);el.setAttribute("aria-pressed",active?"true":"false")})}}
-function pickRandom(){var s=S[Math.floor(Math.random()*S.length)];st.sel=s.id;randomChoice=true;lg("random_pick",{store:s.n});render();showRoute(s);map.panTo([s.lat,s.lng]);document.getElementById("detail").scrollIntoView({behavior:"smooth",block:"start"})}
+function chooseStore(s,label){st.sel=s.id;randomChoice=false;planChoice=label;lg("plan_pick",{store:s.n,plan:label});render();showRoute(s);map.panTo([s.lat,s.lng]);document.getElementById("detail").scrollIntoView({behavior:"smooth",block:"start"})}
+function pickPlan(plan){
+ var candidates=S.slice();
+ if(plan==="near")candidates.sort(function(a,b){return DISTANCE_ORDER.indexOf(a.id)-DISTANCE_ORDER.indexOf(b.id)});
+ if(plan==="new"){var fresh=candidates.filter(function(s){return !vis[s.id]});if(fresh.length)candidates=fresh}
+ var s=candidates[Math.floor(Math.random()*candidates.length)];
+ chooseStore(s,plan==="near"?"近場で確実":plan==="new"?"新しい店へ":"今日は冒険");
+}
+function pickRandom(){var s=S[Math.floor(Math.random()*S.length)];st.sel=s.id;randomChoice=true;planChoice="";lg("random_pick",{store:s.n});render();showRoute(s);map.panTo([s.lat,s.lng]);document.getElementById("detail").scrollIntoView({behavior:"smooth",block:"start"})}
 function find(id){return S.filter(function(s){return s.id===id})[0]}
 function reportUrl(s){
  return "https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform";
@@ -217,7 +242,7 @@ var mk={};
 var densityLayer=L.layerGroup().addTo(map);
 S.forEach(function(s){L.circle([s.lat,s.lng],{radius:45,color:genreColor(s),weight:1,fillColor:genreColor(s),fillOpacity:.08,opacity:.22,interactive:false}).addTo(densityLayer)});
 S.forEach(function(s){mk[s.id]=L.marker([s.lat,s.lng],{icon:icon(s),title:s.n}).addTo(map).on("click",function(){pick(s.id,false)})});
-function pick(id,fromList){st.sel=id;randomChoice=false;var s=find(id);lg("open_detail",{store:s.n});render();showRoute(s);map.panTo([s.lat,s.lng]);
+function pick(id,fromList){st.sel=id;randomChoice=false;planChoice="";var s=find(id);lg("open_detail",{store:s.n});render();showRoute(s);map.panTo([s.lat,s.lng]);
  if(fromList&&window.innerWidth<860){document.getElementById("detail").scrollIntoView({behavior:"smooth",block:"start"})}}
 function render(){
  var list=S.filter(ok).sort(cmp);
@@ -228,7 +253,7 @@ function render(){
  S.forEach(function(s){mk[s.id].setIcon(icon(s));mk[s.id].setZIndexOffset(st.sel===s.id?1000:0)});
  var D=document.getElementById("detail"),s=st.sel&&find(st.sel);
  if(!s){D.innerHTML='<p class="meta">地図のピンか、店の一覧を選ぶと、詳細が表示されます。</p>';return}
- D.innerHTML=randomChoice?'<p class="meta">🎲 今日はここに行ってみよう！</p>':'';
+ D.innerHTML=randomChoice?'<div class="plan-result"><span>🎲</span><b>今日はここに行ってみよう！</b></div>':planChoice?'<div class="plan-result"><span>'+({近場で確実:"🚶","新しい店へ":"🌱","今日は冒険":"🎲"}[planChoice])+'</span><b>'+planChoice+'</b><small>この作戦のおすすめです</small></div>':'';
  D.innerHTML+='<h2>'+s.id+'. '+s.n+'</h2><span class="tag">'+s.g+'</span>'+(vis[s.id]?'<span class="v">✓ 行った</span>':'')+
  '<div class="photos"><div><span class="photo-label">お店の外観</span><img class="photo" src="images/store-'+s.id+'-shop.jpg" alt="'+s.n+'のお店の外観"></div><div><span class="photo-label">料理</span><img class="photo" src="images/store-'+s.id+'-food.jpg" alt="'+s.n+'の料理"></div></div><dl><dt>最安のメニュー</dt><dd><b class="big">'+yen(s.p)+'〜</b>（税込）</dd><dt>代表メニュー</dt><dd>'+s.m+'　'+yen(s.mp)+'</dd><dt>営業時間</dt><dd>'+s.h+'</dd><dt>定休日</dt><dd>'+s.cl+'</dd><dt>大学から</dt><dd>徒歩'+s.w+'分</dd></dl>'+
  '<div class="btns"><button class="pri" id="vb">'+(vis[s.id]?'「行った」を取り消す':'行った店として記録する')+'</button><a class="btn" href="'+reportUrl(s)+'" target="_blank" rel="noopener">訪問報告フォーム</a></div>';
@@ -236,6 +261,7 @@ function render(){
 }
 document.getElementById("list").addEventListener("click",function(e){var el=e.target.closest("[data-id]");if(el)pick(+el.getAttribute("data-id"),true)});
 document.getElementById("randomPick").onclick=pickRandom;
+document.querySelectorAll(".plan-card").forEach(function(el){el.onclick=function(){pickPlan(el.getAttribute("data-plan"))}});
 function bind(id,key,num){document.getElementById(id).onchange=function(){var v=this.type==="checkbox"?this.checked:(num?+this.value:this.value);st[key]=v;lg("filter",{key:key,value:v});render()}}
 document.querySelectorAll(".choice").forEach(function(el){el.onclick=function(){var key=el.getAttribute("data-key"),v=el.getAttribute("data-value");st[key]=key==="b"?+v:v;if(key==="b"||key==="c")broadFiltersChosen[key]=true;document.querySelectorAll('.choice[data-key="'+key+'"]').forEach(function(other){other.classList.toggle("active",other===el);other.setAttribute("aria-pressed",other===el?"true":"false")});lg(key==="o"?"priority_selected":"filter",{key:key,value:st[key]});updatePriorityVisibility();render()}});
 bind("fu","u");
