@@ -78,7 +78,7 @@ textarea{width:100%;height:140px;font:12px/1.4 monospace;color:var(--fg);backgro
 <body>
 <main>
 <header class="hero"><h1>北千住ランチマップ 🍽️</h1><p class="sub">今日の昼休みを、いつもよりちょっと楽しく。</p><div class="hero-stats"><span>東京千住キャンパスから徒歩圏内</span><span>厳選9店舗</span><span>写真・価格・営業時間つき</span></div></header>
-<div class="other-report"><p>対象店舗以外で昼食をとった方や学食や弁当、または昼食をとらなかった方等はこちら</p><a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform?usp=pp_url&amp;entry.273635376=P1&amp;entry.2072569150=2026-11-10&amp;entry.1368935237=%E5%AF%BE%E8%B1%A1%E5%BA%97%E8%88%97%E4%BB%A5%E5%A4%96&amp;entry.270935127=%E3%81%84%E3%81%84%E3%81%88&amp;entry.1703917794=%E6%9C%AC%E3%82%A2%E3%83%97%E3%83%AA%E3%82%92%E8%A6%8B%E3%81%A6&amp;entry.1528988745=%E4%BE%A1%E6%A0%BC&amp;entry.1552917334=800" target="_blank" rel="noopener">対象店舗以外の方はこちら</a></div>
+<div class="other-report"><p>対象店舗以外で昼食をとった方や学食や弁当、または昼食をとらなかった方等はこちら</p><a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform" target="_blank" rel="noopener">対象店舗以外の方はこちら</a></div>
 <div class="unvisited-prompt"><input type="checkbox" id="fu"><label for="fu"><strong>他のお店にも行ってみませんか？</strong><small>チェックすると、まだ訪問していないお店だけを表示します。</small></label></div>
 <div class="random-pick"><p><strong>まだお店が決まらない？</strong><small>条件を決めずに、9店舗から今日の1店を選びます。</small></p><button id="randomPick" type="button">🎲 これを押して！</button></div>
 <div class="filters">
@@ -124,8 +124,7 @@ function updatePriorityVisibility(){var visible=broadFiltersChosen.b&&broadFilte
 function pickRandom(){var s=S[Math.floor(Math.random()*S.length)];st.sel=s.id;randomChoice=true;lg("random_pick",{store:s.n});render();showRoute(s);map.panTo([s.lat,s.lng]);document.getElementById("detail").scrollIntoView({behavior:"smooth",block:"start"})}
 function find(id){return S.filter(function(s){return s.id===id})[0]}
 function reportUrl(s){
- var url="https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform?usp=pp_url";
- return url+"&entry.273635376=P1&entry.2072569150=2026-11-10&entry.1368935237="+encodeURIComponent(s.n)+"&entry.270935127=%E3%81%AF%E3%81%84&entry.1703917794=%E6%9C%AC%E3%82%A2%E3%83%97%E3%83%AA%E3%82%92%E8%A6%8B%E3%81%A6&entry.1528988745=%E4%BE%A1%E6%A0%BC&entry.1552917334=800";
+ return "https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform";
 }
 var map=L.map("map").setView(CAMPUS,17);
 var osm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,referrerPolicy:"strict-origin-when-cross-origin",attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
