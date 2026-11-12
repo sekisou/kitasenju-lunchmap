@@ -203,7 +203,7 @@ function yen(n){return n.toLocaleString("ja-JP")+"円"}
 function ok(s){return (!st.b||s.p<=st.b)&&(!st.c||(st.c==="rice"?s.c!=="洋食":s.c===st.c))&&(!st.w||s.w<=st.w)&&(!st.u||!vis[s.id])}
 function cmp(a,b){if(st.o==="p")return a.p-b.p;if(st.o==="w")return DISTANCE_ORDER.indexOf(a.id)-DISTANCE_ORDER.indexOf(b.id);if(st.o==="g"&&st.c)return (a.c===st.c?0:1)-(b.c===st.c?0:1)||a.id-b.id;return a.id-b.id}
 function updatePriorityVisibility(){var visible=broadFiltersChosen.b&&broadFiltersChosen.c&&st.b===0&&st.c==="";document.getElementById("priorityGroup").hidden=!visible;if(visible&&st.o==="id"){st.o="w";document.querySelectorAll('.choice[data-key="o"]').forEach(function(el){var active=el.getAttribute("data-value")==="w";el.classList.toggle("active",active);el.setAttribute("aria-pressed",active?"true":"false")})}}
-function pickRandom(){var s=S[Math.floor(Math.random()*S.length)];st.sel=s.id;randomChoice=true;lg("random_pick",{store:s.n});render();showRoute(s);map.panTo([s.lat,s.lng]);document.getElementById("detail").scrollIntoView({behavior:"smooth",block:"start"})}
+function pickRandom(){window.location.href="recommend.html"}
 function find(id){return S.filter(function(s){return s.id===id})[0]}
 function reportUrl(s){
  return "https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform";

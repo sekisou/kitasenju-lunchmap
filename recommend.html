@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>今日のおすすめ | 北千住ランチマップ</title>
+<style>
+:root{--bg:#f7f4ed;--fg:#1f2a37;--muted:#5b6570;--card:#fff;--line:#e4e0d8;--accent:#1f6f8b;--soft:#e6f0f3}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 "Noto Sans JP","Hiragino Sans",Meiryo,sans-serif}
+main{max-width:620px;margin:0 auto;padding:18px 16px 42px}
+.back{display:inline-block;margin-bottom:18px;color:var(--accent);font-weight:700;text-decoration:none}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px}
+.eyebrow{margin:0;color:var(--accent);font-size:.75rem;font-weight:800;letter-spacing:.12em}
+h1{margin:2px 0 16px;font-size:1.7rem;line-height:1.3}
+.photo{width:100%;height:230px;object-fit:cover;border-radius:8px;background:var(--bg)}
+.name{margin:16px 0 2px;font-size:1.5rem}
+.genre{margin:0;color:var(--muted)}
+.price{margin:14px 0 0;color:var(--accent);font-size:1.5rem;font-weight:800}
+.facts{display:grid;grid-template-columns:6em 1fr;gap:5px 10px;margin:14px 0 0;padding-top:14px;border-top:1px solid var(--line)}
+.facts dt{color:var(--muted)}.facts dd{margin:0}
+.actions{display:flex;gap:8px;margin-top:20px}
+button,.button{flex:1;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit;text-align:center;text-decoration:none;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.hint{margin:14px 0 0;color:var(--muted);font-size:.82rem;text-align:center}
+@media(max-width:480px){main{padding:12px 12px 32px}.panel{padding:16px}.photo{height:190px}.actions{flex-direction:column}}
+</style>
+</head>
+<body>
+<main>
+<a class="back" href="index.html">← 条件選択に戻る</a>
+<section class="panel">
+<p class="eyebrow">TODAY'S LUNCH</p>
+<h1>今日はここに行ってみよう！</h1>
+<img id="photo" class="photo" alt="">
+<h2 id="name" class="name"></h2>
+<p id="genre" class="genre"></p>
+<p id="price" class="price"></p>
+<dl class="facts"><dt>代表メニュー</dt><dd id="menu"></dd><dt>営業時間</dt><dd id="hours"></dd><dt>大学から</dt><dd id="walk"></dd><dt>定休日</dt><dd id="closed"></dd></dl>
+<div class="actions"><button id="again" class="primary" type="button">🎲 もう一度選ぶ</button><a class="button" href="index.html">店舗一覧を見る</a></div>
+<p class="hint">条件を決めず、9店舗からランダムに選びました。</p>
+</section>
+</main>
+<script>
+var stores=[
+{n:"究極のまかないここのつ",g:"和食・定食",h:"11:00〜15:00",cl:"日曜",w:4,p:750,m:"究極のレバニラ定食",mp:900,id:1},
+{n:"REGALO",g:"イタリアン・カフェ",h:"11:30〜14:30",cl:"月曜・第1火曜",w:4,p:1200,m:"背徳のカルボナーラ",mp:1290,id:2},
+{n:"ビストロウエハラ",g:"フレンチ・ビストロ・洋食",h:"11:30〜14:00",cl:"水曜・第2、第4火曜",w:3,p:2200,m:"平日限定ランチ",mp:2200,id:3},
+{n:"マダム アン ホームキッチン中華私房菜",g:"中華料理",h:"11:00〜15:00",cl:"なし",w:3,p:990,m:"絶品黒酢のすぶた",mp:1320,id:4},
+{n:"マルキン北千住店",g:"韓国料理・焼肉弁当",h:"10:30〜19:00",cl:"日曜",w:3,p:600,m:"カルビ弁当",mp:750,id:5},
+{n:"Pizzeria ALLORO",g:"イタリアン・ピザ・パスタ",h:"11:30〜14:30",cl:"日曜",w:3,p:1250,m:"マルゲリータ（普通サイズ）",mp:1400,id:6},
+{n:"五月家",g:"和食・日本料理",h:"11:30〜14:30",cl:"水曜・第2、第4火曜",w:3,p:928,m:"月替わり 旬菜弁当",mp:1219,id:7},
+{n:"さかなや いいとこ",g:"海鮮料理・和食",h:"11:30〜14:00",cl:"日曜・祝日",w:3,p:980,m:"いいとこ名物バラチラシ丼ランチ",mp:980,id:8},
+{n:"italianbar Sanire北千住店",g:"イタリアン・パスタ",h:"11:00〜（通し営業）",cl:"不定休",w:4,p:700,m:"名物！黒いカルボナーラ",mp:1300,id:9}];
+function show(){
+ var s=stores[Math.floor(Math.random()*stores.length)];
+ document.getElementById("photo").src="images/store-"+s.id+"-food.jpg";
+ document.getElementById("photo").alt=s.n+"の料理";
+ document.getElementById("name").textContent=s.n;
+ document.getElementById("genre").textContent=s.g;
+ document.getElementById("price").textContent=s.p.toLocaleString("ja-JP")+"円〜";
+ document.getElementById("menu").textContent=s.m+"（"+s.mp.toLocaleString("ja-JP")+"円）";
+ document.getElementById("hours").textContent=s.h;
+ document.getElementById("walk").textContent="徒歩"+s.w+"分";
+ document.getElementById("closed").textContent=s.cl;
+}
+document.getElementById("again").onclick=show;
+show();
+</script>
+</body>
+</html>
