@@ -129,6 +129,32 @@ details{box-shadow:none}
  dl{grid-template-columns:6.5em 1fr;font-size:.9rem}
  .photos .photo{height:120px}
 }
+/* Keep the interface focused on the map and the recommendation. */
+body{background:var(--bg)}
+.hero{padding:18px 22px 16px;background:var(--accent);border-radius:10px}
+.hero:after{display:none}
+.hero-stats{margin-top:10px}
+.hero-stats span{border-radius:6px;background:transparent;padding:2px 7px}
+.other-report,.unvisited-prompt,.random-pick,.filters,#detail,.card,details,#map{border-radius:10px}
+.other-report,.unvisited-prompt,.random-pick{padding:10px 12px}
+.unvisited-prompt{background:var(--card);border-color:var(--line)}
+.random-pick{background:var(--card);border-color:var(--line)}
+.random-pick button{background:var(--accent);border-color:var(--accent);box-shadow:none}
+.choices .choice,.priority-choice{border-radius:8px}
+.choice.active{box-shadow:none}
+.card{border-left:4px solid var(--accent)}
+.card[data-c="和食"],.card[data-c="洋食"],.card[data-c="中華"],.card[data-c="韓国・弁当"]{border-left-color:var(--accent)}
+.rank,.wk,.tag{border-radius:6px}
+.filters{padding:16px}
+.grid{gap:12px}
+#detail{padding:16px}
+.photos .photo{border-radius:8px}
+.pin{box-shadow:none}
+@media(max-width:560px){
+ .hero{padding:16px 18px 14px}
+ .hero-stats span{display:none}
+ .filters{padding:14px}
+}
 </style>
 </head>
 <body>
@@ -214,8 +240,6 @@ document.getElementById("locationBtn").onclick=goCurrent;
 function icon(s){var c="pin"+(st.sel===s.id?" sel":"")+(vis[s.id]?" vis":"")+(ok(s)?"":" dim");
  return L.divIcon({className:"",html:'<div class="'+c+'" style="border-color:'+genreColor(s)+'">'+s.id+'</div><div class="pl">'+SN[s.id]+'</div>',iconSize:[34,34],iconAnchor:[17,17]})}
 var mk={};
-var densityLayer=L.layerGroup().addTo(map);
-S.forEach(function(s){L.circle([s.lat,s.lng],{radius:45,color:genreColor(s),weight:1,fillColor:genreColor(s),fillOpacity:.08,opacity:.22,interactive:false}).addTo(densityLayer)});
 S.forEach(function(s){mk[s.id]=L.marker([s.lat,s.lng],{icon:icon(s),title:s.n}).addTo(map).on("click",function(){pick(s.id,false)})});
 function pick(id,fromList){st.sel=id;randomChoice=false;var s=find(id);lg("open_detail",{store:s.n});render();showRoute(s);map.panTo([s.lat,s.lng]);
  if(fromList&&window.innerWidth<860){document.getElementById("detail").scrollIntoView({behavior:"smooth",block:"start"})}}
