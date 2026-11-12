@@ -1,7 +1,8 @@
+const SPREADSHEET_ID = '1nSGZNDn9MvHKVs73VJEZQYTgfGQKEU44MVrl13hOO20';
 const SHEET_NAME = '利用ログ';
 
 function getLogSheet() {
-  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = spreadsheet.getSheetByName(SHEET_NAME);
   if (!sheet) sheet = spreadsheet.insertSheet(SHEET_NAME);
   if (sheet.getLastRow() === 0) {
@@ -17,6 +18,9 @@ function doGet() {
 }
 
 function doPost(e) {
+  if (!e || !e.postData || !e.postData.contents) {
+    throw new Error('POSTデータがありません');
+  }
   const data = JSON.parse(e.postData.contents);
   const sheet = getLogSheet();
   sheet.appendRow([
