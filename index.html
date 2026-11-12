@@ -113,12 +113,10 @@ var S=[
 var SN={1:"ここのつ",2:"REGALO",3:"ウエハラ",4:"マダムアン",5:"マルキン",6:"ALLORO",7:"五月家",8:"いいとこ",9:"Sanire"};
 var DISTANCE_ORDER=[6,5,7,4,3,8,2,1,9];
 var st={b:0,c:"",w:0,u:false,o:"id",sel:null},vis={},logs=[],broadFiltersChosen={b:false,c:false},randomChoice=false;
-var RESEARCH_LOG_ENDPOINT="https://script.google.com/macros/s/AKfycbxrecKn7V08qYuywEoZ5jNO5Nek1EikWPyL6UxwlizB86UEMV0gzeyXpEHRtzK46P9W/exec";
 function ld(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 vis=ld("vis",{});logs=ld("logs",[]);
-function lg(type,o){o=o||{};o.t=new Date().toISOString();o.type=type;logs.push(o);sv("logs",logs);document.getElementById("log").value=JSON.stringify(logs,null,1);if(RESEARCH_LOG_ENDPOINT)sendResearchLog(o)}
-function sendResearchLog(log){fetch(RESEARCH_LOG_ENDPOINT,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({event:log.type,store:log.store||"",timestamp:log.t,filters:{budget:st.b,genre:st.c,walk:st.w,unvisited:st.u,priority:st.o}})}).catch(function(error){console.error("研究ログの送信に失敗しました",error)})}
+function lg(type,o){o=o||{};o.t=new Date().toISOString();o.type=type;logs.push(o);sv("logs",logs);document.getElementById("log").value=JSON.stringify(logs,null,1)}
 function yen(n){return n.toLocaleString("ja-JP")+"円"}
 function ok(s){return (!st.b||s.p<=st.b)&&(!st.c||(st.c==="rice"?s.c!=="洋食":s.c===st.c))&&(!st.w||s.w<=st.w)&&(!st.u||!vis[s.id])}
 function cmp(a,b){if(st.o==="p")return a.p-b.p;if(st.o==="w")return DISTANCE_ORDER.indexOf(a.id)-DISTANCE_ORDER.indexOf(b.id);if(st.o==="g"&&st.c)return (a.c===st.c?0:1)-(b.c===st.c?0:1)||a.id-b.id;return a.id-b.id}
