@@ -67,6 +67,7 @@ a.btn{display:inline-block;text-decoration:none;border:1px solid var(--line);bor
 .pin{width:34px;height:34px;border-radius:50%;background:var(--card);border:3px solid var(--accent);color:var(--fg);font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.35)}
 .pin.vis{background:var(--ok);color:#fff;border-color:var(--ok)}
 .pin.sel{border-color:#e11d48;transform:scale(1.2)}
+.leaflet-popup-content{margin:12px 14px}.map-popup strong{display:block;font-size:1rem}.map-popup small{display:block;color:var(--muted);margin-top:3px}
 .pin.dim{opacity:.3}
 .pl{position:absolute;top:37px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px;font-weight:700;color:#1f2a37;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff}
 details{margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;box-shadow:var(--shadow)}
@@ -244,10 +245,13 @@ function showRoute(s){
 function genreColor(s){return {和食:"#c2410c",洋食:"#b91c4d",中華:"#b45309","韓国・弁当":"#6d28d9"}[s.c]||"#1f6f8b"}
 document.getElementById("campusBtn").onclick=goCampus;
 document.getElementById("locationBtn").onclick=goCurrent;
+function rankFor(s){var ranked=S.filter(ok).sort(cmp);for(var i=0;i<ranked.length;i++)if(ranked[i].id===s.id)return i+1;return 0}
+function popupContent(s){var rank=rankFor(s);return '<div class="map-popup"><strong>'+(rank?rank+"位 ":"")+s.n+'</strong><span>'+s.g+'</span><small>'+yen(s.p)+'〜　徒歩'+s.w+'分</small><small>'+(vis[s.id]?"✓ 訪問済み":"未訪問のお店")+'</small></div>'}
 function icon(s){var c="pin"+(st.sel===s.id?" sel":"")+(vis[s.id]?" vis":"")+(ok(s)?"":" dim");
- return L.divIcon({className:"",html:'<div class="'+c+'" style="border-color:'+genreColor(s)+'">'+s.id+'</div><div class="pl">'+SN[s.id]+'</div>',iconSize:[34,34],iconAnchor:[17,17]})}
+ var rank=rankFor(s);
+ return L.divIcon({className:"",html:'<div class="'+c+'" style="border-color:'+genreColor(s)+'">'+(rank||"・")+'</div><div class="pl">'+SN[s.id]+'</div>',iconSize:[34,34],iconAnchor:[17,17]})}
 var mk={};
-S.forEach(function(s){mk[s.id]=L.marker([s.lat,s.lng],{icon:icon(s),title:s.n}).addTo(map).on("click",function(){pick(s.id,false)})});
+S.forEach(function(s){mk[s.id]=L.marker([s.lat,s.lng],{icon:icon(s),title:s.n}).addTo(map).bindPopup(popupContent(s)).on("click",function(){pick(s.id,false)})});
 function pick(id,fromList){st.sel=id;randomChoice=false;var s=find(id);lg("open_detail",{store:s.n});render();showRoute(s);map.panTo([s.lat,s.lng]);
  if(fromList&&window.innerWidth<860){document.getElementById("detail").scrollIntoView({behavior:"smooth",block:"start"})}}
 function render(){
@@ -256,7 +260,7 @@ function render(){
  var reason=st.o==="id"?"価格・ジャンル・距離のバランスで提案":st.o==="p"?"選んだ価格帯で安い順に提案":st.o==="w"?"大学から近い順で提案":st.c?"選んだジャンルを優先して提案":"ジャンルを選ぶと、そのジャンルを優先して提案";
  var title='<h2 id="list-title">'+(st.o==="id"?"おすすめ":st.o==="p"?"お財布で決める":st.o==="w"?"近さで決める":"おすすめ")+'ランキング 🏆<small>'+reason+'</small></h2>';
  document.getElementById("list").innerHTML=title+(list.length?list.map(function(s,i){var rank=i<3?'<span class="rank '+(i===0?"gold":i===1?"silver":"bronze")+'">'+(i===0?"🥇":i===1?"🥈":"🥉")+' '+(i+1)+"位</span>":"";return '<button class="card'+(st.sel===s.id?' sel':'')+'" data-c="'+s.c+'" data-id="'+s.id+'"><div class="cl"><b>'+rank+s.n+'</b>'+(vis[s.id]?'<span class="v">✓ 行った</span>':'')+'<div class="meta">'+s.g+'</div><div class="meta">'+s.h+'　休み：'+s.cl+'</div></div><div class="cr"><div class="pr">'+s.p.toLocaleString("ja-JP")+'<small>円〜</small></div><div class="wk">徒歩'+s.w+'分</div></div></button>'}).join(""):'<p class="meta">条件に合う店がありません。条件をゆるめてください。</p>');
- S.forEach(function(s){mk[s.id].setIcon(icon(s));mk[s.id].setZIndexOffset(st.sel===s.id?1000:0)});
+ S.forEach(function(s){mk[s.id].setIcon(icon(s));mk[s.id].setPopupContent(popupContent(s));mk[s.id].setZIndexOffset(st.sel===s.id?1000:0)});
  var D=document.getElementById("detail"),s=st.sel&&find(st.sel);
  if(!s){D.innerHTML='<p class="meta">地図のピンか、店の一覧を選ぶと、詳細が表示されます。</p>';return}
  D.innerHTML=randomChoice?'<p class="meta">🎲 今日はここに行ってみよう！</p>':'';
