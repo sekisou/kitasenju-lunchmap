@@ -14,18 +14,15 @@ body{margin:0;background:radial-gradient(circle at 90% 0,#e6f0f3 0,transparent 3
 main{max-width:1100px;margin:0 auto;padding:20px 16px 48px}
 .hero{position:relative;overflow:hidden;margin-bottom:16px;padding:24px 24px 20px;background:linear-gradient(130deg,#1f6f8b,#155267);border-radius:22px;color:#fff;box-shadow:var(--shadow)}
 .hero:after{content:"🍜";position:absolute;right:24px;bottom:-16px;font-size:7rem;opacity:.16;transform:rotate(-12deg)}
-h1{position:relative;z-index:1;font-size:clamp(1.7rem,4vw,2.4rem);line-height:1.25;margin:0 0 6px;color:#fff}
+h1{position:relative;z-index:1;font-size:1.25rem;line-height:1.25;margin:0 0 4px;color:#fff}
 .hero .sub{position:relative;z-index:1;max-width:680px;margin:0;color:rgba(255,255,255,.86)}
 .hero-stats{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.hero-stats span{padding:4px 10px;border:1px solid rgba(255,255,255,.35);border-radius:999px;background:rgba(255,255,255,.12);font-size:.78rem}
 .sub,.note,.meta{color:var(--muted);font-size:.88rem}
 .sub{margin:0 0 14px}
-.other-report{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:12px 14px;background:var(--soft);border:1px solid var(--line);border-radius:12px}
-.other-report p{margin:0;font-size:.9rem}.other-report .btn{flex:none;padding:8px 12px;font-weight:700}
-.unvisited-prompt{display:flex;align-items:center;gap:10px;margin:0 0 14px;padding:12px 14px;background:#fff8df;border:1px solid #efd98a;border-radius:12px}
-.unvisited-prompt input{width:20px;height:20px;flex:none}.unvisited-prompt label{cursor:pointer}.unvisited-prompt strong{display:block;font-size:.95rem}.unvisited-prompt small{display:block;color:var(--muted);font-size:.78rem}
+.post-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}.other-report,.random-pick{display:flex;flex-direction:column;justify-content:space-between;gap:10px;margin:0;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:12px}.other-report p,.random-pick p{margin:0;font-size:.9rem}.other-report .btn,.random-pick button{width:100%;padding:10px 12px;font-weight:700;text-align:center}
 .filters{display:grid;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
 .filter-group{display:flex;flex-direction:column;gap:7px}.filter-group[hidden]{display:none!important}.filter-title{font-weight:700;font-size:.95rem}.filter-hint{color:var(--muted);font-size:.78rem}
-.random-pick{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:linear-gradient(100deg,#fff0f5,#fff7ed);border:1px solid #f1bfd0;border-radius:14px;box-shadow:var(--shadow)}.random-pick p{margin:0;font-size:.95rem}.random-pick small{display:block;color:var(--muted);font-size:.76rem}.random-pick button{width:auto;min-height:42px;background:#e11d48;color:#fff;border-color:#e11d48;font-weight:700;white-space:nowrap;box-shadow:0 4px 0 #b5163a;transition:.15s}.random-pick button:hover{transform:translateY(-2px);box-shadow:0 6px 0 #b5163a}
+.random-pick{background:linear-gradient(100deg,#fff0f5,#fff7ed);border-color:#f1bfd0}.random-pick small{display:block;color:var(--muted);font-size:.76rem}.random-pick button{min-height:46px;background:#e11d48;color:#fff;border-color:#e11d48;white-space:nowrap;box-shadow:0 4px 0 #b5163a;transition:.15s}.random-pick button:hover{transform:translateY(-2px);box-shadow:0 6px 0 #b5163a}
 .choices{display:flex;flex-wrap:wrap;gap:7px}.choice{width:auto;min-height:40px;padding:6px 12px;border-radius:999px;background:var(--bg);transition:.15s}
 .choice:hover{border-color:var(--accent);transform:translateY(-1px)}.choice.active{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);font-weight:700}
 .priority-choices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.priority-choice{display:flex;flex-direction:column;align-items:flex-start;text-align:left;border-radius:12px;padding:10px 12px;line-height:1.35}.priority-choice strong{font-size:.92rem}.priority-choice small{font-size:.72rem;color:var(--muted);font-weight:400}.priority-choice.active small{color:inherit;opacity:.85}
@@ -111,7 +108,7 @@ details{box-shadow:none}
  #map{height:38vh;min-height:260px}
 }
 @media(max-width:560px){
- .hero h1{font-size:1.55rem}
+ .hero h1{font-size:1.25rem}
  .hero .sub{font-size:.86rem}
  .hero-stats{gap:5px}
  .hero-stats span{padding:3px 7px;font-size:.68rem}
@@ -119,6 +116,7 @@ details{box-shadow:none}
  .other-report .btn{width:100%;text-align:center}
  .random-pick{align-items:stretch;flex-direction:column}
  .random-pick button{width:100%}
+ .post-actions{grid-template-columns:1fr}
  .filters{padding:16px}
  .choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
  .choice{width:100%;padding-inline:8px}
@@ -171,9 +169,10 @@ body{background:var(--bg)}
 <div class="filter-tools" id="filterTools" hidden><button id="rs" class="reset" type="button">↺ 条件をリセット</button></div>
 </div>
 <div id="postChoice" hidden>
-<div class="unvisited-prompt"><input type="checkbox" id="fu"><label for="fu"><strong>未訪問のお店を優先する</strong><small>チェックすると、まだ行っていないお店だけを表示します。商店街をもっと開拓できます。</small></label></div>
+<div class="post-actions">
 <div class="random-pick"><p><strong>まだお店が決まらない？</strong><small>条件に合うお店から、今日の1店を選びます。</small></p><button id="randomPick" type="button">🎲 今日の1店を選ぶ</button></div>
 <div class="other-report"><p>対象店舗以外で昼食をとった方はこちら</p><a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform" target="_blank" rel="noopener">報告フォーム</a></div>
+</div>
 <div id="count" class="meta"></div>
 <div class="grid"><div><div class="map-heading"><strong>📍 お店の位置</strong><span>ピンを押すとおすすめ理由を表示</span></div><div id="map" role="region" aria-label="店舗の地図"></div><div class="map-actions"><button id="campusBtn" type="button">🏫 1号館に戻る</button><button id="locationBtn" type="button">📍 現在位置に戻る</button><span id="locationStatus" class="location-status" role="status"></span></div><div class="map-legend"><span><i class="legend-dot" style="background:#c2410c"></i>米・和食</span><span><i class="legend-dot" style="background:#b91c4d"></i>洋食</span><span><i class="legend-dot" style="background:#b45309"></i>中華</span><span><i class="legend-dot" style="background:#6d28d9"></i>韓国・弁当</span></div></div><aside id="detail"></aside><div id="list"></div></div>
 </div>
@@ -197,14 +196,14 @@ var S=[
 {id:9,n:"italianbar Sanire北千住店",g:"イタリアン・パスタ",c:"洋食",h:"11:00〜（通し営業）",cl:"不定休",w:4,p:700,m:"名物！黒いカルボナーラ",mp:1300,lat:35.749381,lng:139.808882}];
 var SN={1:"ここのつ",2:"REGALO",3:"ウエハラ",4:"マダムアン",5:"マルキン",6:"ALLORO",7:"五月家",8:"いいとこ",9:"Sanire"};
 var DISTANCE_ORDER=[6,5,7,4,3,8,2,1,9];
-var st={b:"",c:"",w:0,u:false,o:"id",q:"",sel:null},vis={},logs=[],randomChoice=false;
+var st={b:"",c:"",w:0,o:"id",q:"",sel:null},vis={},logs=[],randomChoice=false;
 function ld(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 vis=ld("vis",{});logs=ld("logs",[]);
 function lg(type,o){o=o||{};o.t=new Date().toISOString();o.type=type;logs.push(o);sv("logs",logs);document.getElementById("log").value=JSON.stringify(logs,null,1)}
 function yen(n){return n.toLocaleString("ja-JP")+"円"}
-function ok(s){return (!st.b||(st.b==="low"?s.p<=1000:s.p>=1001))&&(!st.c||(st.c==="rice"?s.c!=="洋食":s.c===st.c))&&(!st.w||s.w<=st.w)&&(!st.u||!vis[s.id])}
-function cmp(a,b){if(st.o==="p")return a.p-b.p;if(st.o==="w")return DISTANCE_ORDER.indexOf(a.id)-DISTANCE_ORDER.indexOf(b.id);if(st.o==="g"&&st.c)return (a.c===st.c?0:1)-(b.c===st.c?0:1)||a.id-b.id;return a.id-b.id}
+function ok(s){return (!st.b||(st.b==="low"?s.p<=1000:s.p>=1001))&&(!st.c||(st.c==="rice"?s.c!=="洋食":s.c===st.c))&&(!st.w||s.w<=st.w)}
+function cmp(a,b){var visited=(vis[a.id]?1:0)-(vis[b.id]?1:0);if(visited)return visited;if(st.o==="p")return a.p-b.p;if(st.o==="w")return DISTANCE_ORDER.indexOf(a.id)-DISTANCE_ORDER.indexOf(b.id);if(st.o==="g"&&st.c)return (a.c===st.c?0:1)-(b.c===st.c?0:1)||a.id-b.id;return a.id-b.id}
 function updatePrioritySelection(){var selected=!!st.q;document.getElementById("genreGroup").hidden=st.q!=="c";document.getElementById("budgetGroup").hidden=st.q!=="b";document.getElementById("postChoice").hidden=!selected;document.getElementById("filterTools").hidden=!selected;if(selected)window.setTimeout(function(){map.invalidateSize()},0)}
 function nextUnvisited(current){var candidates=S.filter(function(store){return store.id!==current.id&&!vis[store.id]&&ok(store)}).sort(cmp);return candidates[0]||S.filter(function(store){return store.id!==current.id&&!vis[store.id]}).sort(cmp)[0]}
 function resetDetailedFilters(){st.b="";st.c="";document.querySelectorAll('.choice[data-key="c"],.choice[data-key="b"]').forEach(function(el){var key=el.getAttribute("data-key"),active=key==="c"&&el.getAttribute("data-value")==="";el.classList.toggle("active",active);el.setAttribute("aria-pressed",active?"true":"false")})}
@@ -271,8 +270,7 @@ document.getElementById("list").addEventListener("click",function(e){var el=e.ta
 document.getElementById("randomPick").onclick=pickRandom;
 function bind(id,key,num){document.getElementById(id).onchange=function(){var v=this.type==="checkbox"?this.checked:(num?+this.value:this.value);st[key]=v;lg("filter",{key:key,value:v});render()}}
 document.querySelectorAll(".choice").forEach(function(el){el.onclick=function(){var key=el.getAttribute("data-key"),v=el.getAttribute("data-value");if(key==="q"){if(st.q!==v)resetDetailedFilters();st.q=v;st.o=v==="w"?"w":v==="b"?"p":"g";updatePrioritySelection()}else{st[key]=key==="b"?v:v}document.querySelectorAll('.choice[data-key="'+key+'"]').forEach(function(other){other.classList.toggle("active",other===el);other.setAttribute("aria-pressed",other===el?"true":"false")});lg(key==="q"?"priority_selected":"filter",{key:key,value:key==="q"?st.q:st[key]});render()}});
-bind("fu","u");
-document.getElementById("rs").onclick=function(){st.b="";st.c="";st.w=0;st.u=false;st.o="id";st.q="";document.getElementById("fu").checked=false;document.querySelectorAll(".choice").forEach(function(el){var key=el.getAttribute("data-key"),active=key==="c"&&el.getAttribute("data-value")==="";el.classList.toggle("active",active);el.setAttribute("aria-pressed",active?"true":"false")});updatePrioritySelection();lg("filter_reset");render()};
+document.getElementById("rs").onclick=function(){st.b="";st.c="";st.w=0;st.o="id";st.q="";document.querySelectorAll(".choice").forEach(function(el){var key=el.getAttribute("data-key"),active=key==="c"&&el.getAttribute("data-value")==="";el.classList.toggle("active",active);el.setAttribute("aria-pressed",active?"true":"false")});updatePrioritySelection();lg("filter_reset");render()};
 document.getElementById("clr").onclick=function(){logs=[];sv("logs",logs);document.getElementById("log").value=""};
 document.getElementById("log").value=logs.length?JSON.stringify(logs,null,1):"";
 updatePrioritySelection();
