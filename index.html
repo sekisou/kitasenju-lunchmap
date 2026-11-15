@@ -38,6 +38,7 @@ select,button{font:inherit;color:var(--fg);background:var(--bg);border:1px solid
 .grid>div:first-child{grid-area:map}
 @media(min-width:860px){.grid{grid-template-columns:1.2fr 1fr;grid-template-areas:"map detail" "map list";grid-template-rows:auto 1fr;align-items:start}}
 #map{grid-area:map;height:46vh;min-height:300px;border:1px solid var(--line);border-radius:14px;font-family:inherit;overflow:hidden;box-shadow:var(--shadow)}
+.map-tiles{filter:grayscale(1) brightness(1.08) contrast(.82);opacity:.72}
 @media(min-width:860px){#map{height:78vh;position:sticky;top:12px}}
 .map-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.map-heading strong{font-size:1.05rem}.map-heading span{color:var(--muted);font-size:.76rem}
 .map-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.map-actions button{width:auto;min-height:40px}.location-status{color:var(--muted);font-size:.8rem}
@@ -217,7 +218,7 @@ function reportUrl(s){
  return "https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform";
 }
 var map=L.map("map").setView(CAMPUS,17);
-var osm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,referrerPolicy:"strict-origin-when-cross-origin",attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
+var osm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,className:"map-tiles",referrerPolicy:"strict-origin-when-cross-origin",attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
 osm.addTo(map);
 L.marker(CAMPUS,{icon:L.divIcon({className:"",html:'<div class="pin" style="border-color:#e11d48">大</div><div class="pl">1号館</div>',iconSize:[34,34],iconAnchor:[17,17]})}).addTo(map);
 var currentMarker=null,currentAccuracy=null,routeLine=null;
