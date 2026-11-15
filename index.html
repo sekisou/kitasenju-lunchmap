@@ -164,12 +164,12 @@ body{background:var(--bg)}
 <div class="unvisited-prompt"><input type="checkbox" id="fu"><label for="fu"><strong>他のお店にも行ってみませんか？</strong><small>チェックすると、まだ訪問していないお店だけを表示します。</small></label></div>
 <div class="random-pick"><p><strong>まだお店が決まらない？</strong><small>条件を決めずに、9店舗から今日の1店を選びます。</small></p><button id="randomPick" type="button">🎲 これを押して！</button></div>
 <div class="filters">
+<div class="filter-group" id="priorityGroup"><span class="filter-title">今日は何を重視しますか？</span><span class="filter-hint">ジャンル・金額・近さから選んでください</span><div class="choices priority-choices" id="priorityChoices">
+<button class="choice priority-choice" type="button" data-key="q" data-value="c" aria-pressed="false"><strong>🍽️ ジャンル</strong><small>食べたい料理で選ぶ</small></button><button class="choice priority-choice" type="button" data-key="q" data-value="b" aria-pressed="false"><strong>💰 金額</strong><small>予算で選ぶ</small></button><button class="choice priority-choice" type="button" data-key="q" data-value="w" aria-pressed="false"><strong>🚶 近さ</strong><small>大学からの距離で選ぶ</small></button></div></div>
 <div class="filter-group" id="genreGroup" hidden><span class="filter-title">今日は何を食べたい？</span><span class="filter-hint">気分に近いジャンルを選んでね</span><div class="choices" id="genreChoices">
 <button class="choice active" type="button" data-key="c" data-value="">🍽️ なんでも</button><button class="choice" type="button" data-key="c" data-value="rice">🍚 米・和食</button><button class="choice" type="button" data-key="c" data-value="洋食">🍝 洋食</button></div></div>
 <div class="filter-group" id="budgetGroup" hidden><span class="filter-title">お財布の気分は？</span><span class="filter-hint">ランチの最安メニューで絞り込み</span><div class="choices" id="budgetChoices">
 <button class="choice active" type="button" data-key="b" data-value="0">💰 こだわらない</button><button class="choice" type="button" data-key="b" data-value="1000">💴 なるべく安く（1,000円以下）</button></div></div>
-<div class="filter-group" id="priorityGroup"><span class="filter-title">今日は何を重視しますか？</span><span class="filter-hint">ジャンル・金額・近さから選んでください</span><div class="choices priority-choices" id="priorityChoices">
-<button class="choice priority-choice" type="button" data-key="q" data-value="c" aria-pressed="false"><strong>🍽️ ジャンル</strong><small>食べたい料理で選ぶ</small></button><button class="choice priority-choice" type="button" data-key="q" data-value="b" aria-pressed="false"><strong>💰 金額</strong><small>予算で選ぶ</small></button><button class="choice priority-choice" type="button" data-key="q" data-value="w" aria-pressed="false"><strong>🚶 近さ</strong><small>大学からの距離で選ぶ</small></button></div></div>
 <div class="filter-tools"><button id="rs" class="reset" type="button">↺ 条件をリセット</button></div>
 </div>
 <div id="count" class="meta"></div>
