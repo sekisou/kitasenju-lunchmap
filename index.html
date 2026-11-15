@@ -12,14 +12,15 @@
 *{box-sizing:border-box}
 body{margin:0;background:radial-gradient(circle at 90% 0,#e6f0f3 0,transparent 30%),var(--bg);color:var(--fg);font:17px/1.6 "Noto Sans JP","Hiragino Sans",Meiryo,sans-serif}
 main{max-width:1100px;margin:0 auto;padding:20px 16px 48px}
-.hero{position:relative;overflow:hidden;margin-bottom:16px;padding:24px 24px 20px;background:linear-gradient(130deg,#1f6f8b,#155267);border-radius:22px;color:#fff;box-shadow:var(--shadow)}
+.hero{display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;margin-bottom:16px;padding:0;background:transparent;color:var(--fg)}
 .hero:after{content:"🍜";position:absolute;right:24px;bottom:-16px;font-size:7rem;opacity:.16;transform:rotate(-12deg)}
-h1{position:relative;z-index:1;font-size:1.25rem;line-height:1.25;margin:0 0 4px;color:#fff}
-.hero .sub{position:relative;z-index:1;max-width:680px;margin:0;color:rgba(255,255,255,.86)}
+h1{position:relative;z-index:1;font-size:.95rem;line-height:1.25;margin:0;padding:5px 8px;background:var(--accent);border-radius:5px;color:#fff;white-space:nowrap}
+.hero .sub{position:relative;z-index:1;max-width:680px;margin:0;color:var(--muted);font-size:.82rem}
 .hero-stats{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.hero-stats span{padding:4px 10px;border:1px solid rgba(255,255,255,.35);border-radius:999px;background:rgba(255,255,255,.12);font-size:.78rem}
 .sub,.note,.meta{color:var(--muted);font-size:.88rem}
 .sub{margin:0 0 14px}
 .post-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}.other-report,.random-pick{display:flex;flex-direction:column;justify-content:space-between;gap:10px;margin:0;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:12px}.other-report p,.random-pick p{margin:0;font-size:.9rem}.other-report .btn,.random-pick button{width:100%;padding:10px 12px;font-weight:700;text-align:center}
+.report-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:10px}.report-top p{margin:0;font-size:.88rem}.report-top .btn{flex:none;padding:11px 18px;background:#dc2626;border-color:#dc2626;color:#fff;font-weight:700}
 .filters{display:grid;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
 .filter-group{display:flex;flex-direction:column;gap:7px}.filter-group[hidden]{display:none!important}.filter-title{font-weight:700;font-size:.95rem}.filter-hint{color:var(--muted);font-size:.78rem}
 .random-pick{background:linear-gradient(100deg,#fff0f5,#fff7ed);border-color:#f1bfd0}.random-pick small{display:block;color:var(--muted);font-size:.76rem}.random-pick button{min-height:46px;background:#e11d48;color:#fff;border-color:#e11d48;white-space:nowrap;box-shadow:0 4px 0 #b5163a;transition:.15s}.random-pick button:hover{transform:translateY(-2px);box-shadow:0 6px 0 #b5163a}
@@ -72,7 +73,7 @@ details{margin-top:20px;background:var(--card);border:1px solid var(--line);bord
 textarea{width:100%;height:140px;font:12px/1.4 monospace;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px}
 body{background:var(--bg);font-size:16px}
 main{max-width:1180px;padding:24px 20px 56px}
-.hero{margin-bottom:20px;padding:28px 30px 24px;border-radius:16px;box-shadow:none}
+.hero{margin-bottom:20px;padding:0;border-radius:0;box-shadow:none}
 .hero:after{right:28px;bottom:-22px;font-size:6rem}
 .hero-stats{margin-top:14px}
 .hero-stats span{font-size:.75rem}
@@ -102,13 +103,13 @@ main{max-width:1180px;padding:24px 20px 56px}
 details{box-shadow:none}
 @media(max-width:859px){
  main{padding:14px 12px 40px}
- .hero{padding:22px 20px 18px}
+ .hero{padding:0}
  .hero:after{right:12px;font-size:5rem}
  .grid{grid-template-areas:"list" "detail" "map"}
  #map{height:38vh;min-height:260px}
 }
 @media(max-width:560px){
- .hero h1{font-size:1.25rem}
+ .hero h1{font-size:.95rem}
  .hero .sub{font-size:.86rem}
  .hero-stats{gap:5px}
  .hero-stats span{padding:3px 7px;font-size:.68rem}
@@ -117,6 +118,8 @@ details{box-shadow:none}
  .random-pick{align-items:stretch;flex-direction:column}
  .random-pick button{width:100%}
  .post-actions{grid-template-columns:1fr}
+ .report-top{align-items:flex-start;flex-direction:column}
+ .report-top .btn{width:100%;text-align:center}
  .filters{padding:16px}
  .choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
  .choice{width:100%;padding-inline:8px}
@@ -158,7 +161,8 @@ body{background:var(--bg)}
 </head>
 <body>
 <main>
-<header class="hero"><h1>北千住ランチマップ 🍽️</h1><p class="sub">今日の昼休みを、いつもよりちょっと楽しく。</p><div class="hero-stats"><span>東京千住キャンパスから徒歩圏内</span><span>厳選9店舗</span><span>写真・価格・営業時間つき</span></div></header>
+<header class="hero"><h1>北千住ランチマップ</h1><p class="sub">大学周辺のランチを、気分に合わせて見つけよう。</p></header>
+<div class="report-top"><p>対象店舗以外で昼食をとった方はこちら</p><a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform" target="_blank" rel="noopener">報告フォーム</a></div>
 <div class="filters">
 <div class="filter-group" id="priorityGroup"><span class="filter-title">今日は何を重視しますか？</span><span class="filter-hint">ジャンル・金額・近さから選んでください</span><div class="choices priority-choices" id="priorityChoices">
 <button class="choice priority-choice" type="button" data-key="q" data-value="c" aria-pressed="false"><strong>🍽️ ジャンル</strong><small>食べたい料理で選ぶ</small></button><button class="choice priority-choice" type="button" data-key="q" data-value="b" aria-pressed="false"><strong>💰 金額</strong><small>予算で選ぶ</small></button><button class="choice priority-choice" type="button" data-key="q" data-value="w" aria-pressed="false"><strong>🚶 近さ</strong><small>大学からの距離で選ぶ</small></button></div></div>
@@ -171,7 +175,6 @@ body{background:var(--bg)}
 <div id="postChoice" hidden>
 <div class="post-actions">
 <div class="random-pick"><p><strong>まだお店が決まらない？</strong><small>条件に合うお店から、今日の1店を選びます。</small></p><button id="randomPick" type="button">🎲 今日の1店を選ぶ</button></div>
-<div class="other-report"><p>対象店舗以外で昼食をとった方はこちら</p><a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSddN63sw8_SElr3ApmrsYQ-EtVgP1ZQa-K8f45_F1Lk3y31Aw/viewform" target="_blank" rel="noopener">報告フォーム</a></div>
 </div>
 <div id="count" class="meta"></div>
 <div class="grid"><div><div class="map-heading"><strong>📍 お店の位置</strong><span>ピンを押すとおすすめ理由を表示</span></div><div id="map" role="region" aria-label="店舗の地図"></div><div class="map-actions"><button id="campusBtn" type="button">🏫 1号館に戻る</button><button id="locationBtn" type="button">📍 現在位置に戻る</button><span id="locationStatus" class="location-status" role="status"></span></div><div class="map-legend"><span><i class="legend-dot" style="background:#c2410c"></i>米・和食</span><span><i class="legend-dot" style="background:#b91c4d"></i>洋食</span><span><i class="legend-dot" style="background:#b45309"></i>中華</span><span><i class="legend-dot" style="background:#6d28d9"></i>韓国・弁当</span></div></div><aside id="detail"></aside><div id="list"></div></div>
