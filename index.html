@@ -105,8 +105,8 @@ details{box-shadow:none}
  main{padding:14px 12px 40px}
  .hero{padding:0}
  .hero:after{right:12px;font-size:5rem}
- .grid{grid-template-areas:"list" "detail" "map"}
- #map{height:38vh;min-height:260px}
+ .grid{grid-template-areas:"map" "detail" "list"}
+ #map{height:48vh;min-height:320px}
 }
 @media(max-width:560px){
  .hero h1{font-size:.95rem}
@@ -177,7 +177,7 @@ body{background:var(--bg)}
 <div class="random-pick"><p><strong>まだお店が決まらない？</strong><small>条件に合うお店から、今日の1店を選びます。</small></p><button id="randomPick" type="button">🎲 今日の1店を選ぶ</button></div>
 </div>
 <div id="count" class="meta"></div>
-<div class="grid"><div><div class="map-heading"><strong>📍 お店の位置</strong><span>ピンを押すとおすすめ理由を表示</span></div><div id="map" role="region" aria-label="店舗の地図"></div><div class="map-actions"><button id="campusBtn" type="button">🏫 1号館に戻る</button><button id="locationBtn" type="button">📍 現在位置に戻る</button><span id="locationStatus" class="location-status" role="status"></span></div><div class="map-legend"><span><i class="legend-dot" style="background:#c2410c"></i>米・和食</span><span><i class="legend-dot" style="background:#b91c4d"></i>洋食</span><span><i class="legend-dot" style="background:#b45309"></i>中華</span><span><i class="legend-dot" style="background:#6d28d9"></i>韓国・弁当</span></div></div><aside id="detail"></aside><div id="list"></div></div>
+<div class="grid"><div><div class="map-heading"><strong>📍 地図から探す</strong><span>気になるピンを押してお店を見てみよう</span></div><div id="map" role="region" aria-label="店舗の地図"></div><div class="map-actions"><button id="campusBtn" type="button">🏫 大学を中心に見る</button><button id="locationBtn" type="button">📍 現在位置に戻る</button><span id="locationStatus" class="location-status" role="status"></span></div><div class="map-legend"><span><i class="legend-dot" style="background:#c2410c"></i>米・和食</span><span><i class="legend-dot" style="background:#b91c4d"></i>洋食</span><span><i class="legend-dot" style="background:#b45309"></i>中華</span><span><i class="legend-dot" style="background:#6d28d9"></i>韓国・弁当</span></div></div><aside id="detail"></aside><div id="list"></div></div>
 </div>
 <details><summary>閲覧ログ（試作の確認用）</summary>
 <p class="note">どの店のどの情報を見たかの記録の例です。このブラウザ内にだけ保存されます。</p>
