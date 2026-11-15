@@ -169,7 +169,7 @@ body{background:var(--bg)}
 <div class="filter-group" id="genreGroup" hidden><span class="filter-title">今日は何を食べたい？</span><span class="filter-hint">気分に近いジャンルを選んでね</span><div class="choices" id="genreChoices">
 <button class="choice active" type="button" data-key="c" data-value="">🍽️ なんでも</button><button class="choice" type="button" data-key="c" data-value="rice">🍚 米・和食</button><button class="choice" type="button" data-key="c" data-value="洋食">🍝 洋食</button></div></div>
 <div class="filter-group" id="budgetGroup" hidden><span class="filter-title">お財布の気分は？</span><span class="filter-hint">ランチの最安メニューで絞り込み</span><div class="choices" id="budgetChoices">
-<button class="choice active" type="button" data-key="b" data-value="0">💰 こだわらない</button><button class="choice" type="button" data-key="b" data-value="1000">💴 なるべく安く（1,000円以下）</button></div></div>
+<button class="choice" type="button" data-key="b" data-value="low">💴 なるべく安く（1,000円以下）</button><button class="choice" type="button" data-key="b" data-value="high">💰 少し奮発できる（1,001円以上）</button></div></div>
 <div class="filter-tools"><button id="rs" class="reset" type="button">↺ 条件をリセット</button></div>
 </div>
 <div id="count" class="meta"></div>
@@ -194,13 +194,13 @@ var S=[
 {id:9,n:"italianbar Sanire北千住店",g:"イタリアン・パスタ",c:"洋食",h:"11:00〜（通し営業）",cl:"不定休",w:4,p:700,m:"名物！黒いカルボナーラ",mp:1300,lat:35.749381,lng:139.808882}];
 var SN={1:"ここのつ",2:"REGALO",3:"ウエハラ",4:"マダムアン",5:"マルキン",6:"ALLORO",7:"五月家",8:"いいとこ",9:"Sanire"};
 var DISTANCE_ORDER=[6,5,7,4,3,8,2,1,9];
-var st={b:0,c:"",w:0,u:false,o:"id",q:"",sel:null},vis={},logs=[],randomChoice=false;
+var st={b:"",c:"",w:0,u:false,o:"id",q:"",sel:null},vis={},logs=[],randomChoice=false;
 function ld(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 vis=ld("vis",{});logs=ld("logs",[]);
 function lg(type,o){o=o||{};o.t=new Date().toISOString();o.type=type;logs.push(o);sv("logs",logs);document.getElementById("log").value=JSON.stringify(logs,null,1)}
 function yen(n){return n.toLocaleString("ja-JP")+"円"}
-function ok(s){return (!st.b||s.p<=st.b)&&(!st.c||(st.c==="rice"?s.c!=="洋食":s.c===st.c))&&(!st.w||s.w<=st.w)&&(!st.u||!vis[s.id])}
+function ok(s){return (!st.b||(st.b==="low"?s.p<=1000:s.p>=1001))&&(!st.c||(st.c==="rice"?s.c!=="洋食":s.c===st.c))&&(!st.w||s.w<=st.w)&&(!st.u||!vis[s.id])}
 function cmp(a,b){if(st.o==="p")return a.p-b.p;if(st.o==="w")return DISTANCE_ORDER.indexOf(a.id)-DISTANCE_ORDER.indexOf(b.id);if(st.o==="g"&&st.c)return (a.c===st.c?0:1)-(b.c===st.c?0:1)||a.id-b.id;return a.id-b.id}
 function updatePrioritySelection(){document.getElementById("genreGroup").hidden=st.q!=="c";document.getElementById("budgetGroup").hidden=st.q!=="b"}
 function pickRandom(){window.location.href="recommend.html"}
@@ -246,7 +246,7 @@ function pick(id,fromList){st.sel=id;randomChoice=false;var s=find(id);lg("open_
 function render(){
  var list=S.filter(ok).sort(cmp);
  document.getElementById("count").textContent=list.length+"店が条件に合います（全"+S.length+"店）";
- var reason=st.o==="id"?"価格・ジャンル・距離のバランスで提案":st.o==="p"?"お財布にやさしい順で提案":st.o==="w"?"大学から近い順で提案":st.c?"選んだジャンルを優先して提案":"ジャンルを選ぶと、そのジャンルを優先して提案";
+ var reason=st.o==="id"?"価格・ジャンル・距離のバランスで提案":st.o==="p"?"選んだ価格帯で安い順に提案":st.o==="w"?"大学から近い順で提案":st.c?"選んだジャンルを優先して提案":"ジャンルを選ぶと、そのジャンルを優先して提案";
  var title='<h2 id="list-title">'+(st.o==="id"?"おすすめ":st.o==="p"?"お財布で決める":st.o==="w"?"近さで決める":"おすすめ")+'ランキング 🏆<small>'+reason+'</small></h2>';
  document.getElementById("list").innerHTML=title+(list.length?list.map(function(s,i){var rank=i<3?'<span class="rank '+(i===0?"gold":i===1?"silver":"bronze")+'">'+(i===0?"🥇":i===1?"🥈":"🥉")+' '+(i+1)+"位</span>":"";return '<button class="card'+(st.sel===s.id?' sel':'')+'" data-c="'+s.c+'" data-id="'+s.id+'"><div class="cl"><b>'+rank+s.n+'</b>'+(vis[s.id]?'<span class="v">✓ 行った</span>':'')+'<div class="meta">'+s.g+'</div><div class="meta">'+s.h+'　休み：'+s.cl+'</div></div><div class="cr"><div class="pr">'+s.p.toLocaleString("ja-JP")+'<small>円〜</small></div><div class="wk">徒歩'+s.w+'分</div></div></button>'}).join(""):'<p class="meta">条件に合う店がありません。条件をゆるめてください。</p>');
  S.forEach(function(s){mk[s.id].setIcon(icon(s));mk[s.id].setZIndexOffset(st.sel===s.id?1000:0)});
@@ -261,9 +261,9 @@ function render(){
 document.getElementById("list").addEventListener("click",function(e){var el=e.target.closest("[data-id]");if(el)pick(+el.getAttribute("data-id"),true)});
 document.getElementById("randomPick").onclick=pickRandom;
 function bind(id,key,num){document.getElementById(id).onchange=function(){var v=this.type==="checkbox"?this.checked:(num?+this.value:this.value);st[key]=v;lg("filter",{key:key,value:v});render()}}
-document.querySelectorAll(".choice").forEach(function(el){el.onclick=function(){var key=el.getAttribute("data-key"),v=el.getAttribute("data-value");if(key==="q"){st.q=v;st.o=v==="w"?"w":v==="b"?"p":"g";updatePrioritySelection()}else{st[key]=key==="b"?+v:v}document.querySelectorAll('.choice[data-key="'+key+'"]').forEach(function(other){other.classList.toggle("active",other===el);other.setAttribute("aria-pressed",other===el?"true":"false")});lg(key==="q"?"priority_selected":"filter",{key:key,value:key==="q"?st.q:st[key]});render()}});
+document.querySelectorAll(".choice").forEach(function(el){el.onclick=function(){var key=el.getAttribute("data-key"),v=el.getAttribute("data-value");if(key==="q"){st.q=v;st.o=v==="w"?"w":v==="b"?"p":"g";updatePrioritySelection()}else{st[key]=key==="b"?v:v}document.querySelectorAll('.choice[data-key="'+key+'"]').forEach(function(other){other.classList.toggle("active",other===el);other.setAttribute("aria-pressed",other===el?"true":"false")});lg(key==="q"?"priority_selected":"filter",{key:key,value:key==="q"?st.q:st[key]});render()}});
 bind("fu","u");
-document.getElementById("rs").onclick=function(){st.b=0;st.c="";st.w=0;st.u=false;st.o="id";st.q="";document.getElementById("fu").checked=false;document.querySelectorAll(".choice").forEach(function(el){var key=el.getAttribute("data-key"),active=(key==="b"&&el.getAttribute("data-value")==="0")||(key==="c"&&el.getAttribute("data-value")==="");el.classList.toggle("active",active);el.setAttribute("aria-pressed",active?"true":"false")});updatePrioritySelection();lg("filter_reset");render()};
+document.getElementById("rs").onclick=function(){st.b="";st.c="";st.w=0;st.u=false;st.o="id";st.q="";document.getElementById("fu").checked=false;document.querySelectorAll(".choice").forEach(function(el){var key=el.getAttribute("data-key"),active=key==="c"&&el.getAttribute("data-value")==="";el.classList.toggle("active",active);el.setAttribute("aria-pressed",active?"true":"false")});updatePrioritySelection();lg("filter_reset");render()};
 document.getElementById("clr").onclick=function(){logs=[];sv("logs",logs);document.getElementById("log").value=""};
 document.getElementById("log").value=logs.length?JSON.stringify(logs,null,1):"";
 updatePrioritySelection();
