@@ -65,7 +65,8 @@ a.btn{display:inline-block;text-decoration:none;border:1px solid var(--line);bor
 .cl{min-width:0}.cr{text-align:right;flex:none}
 .pr{font-size:1.5rem;font-weight:700;color:var(--accent);line-height:1.1}.pr small{font-size:.75rem;font-weight:400;color:var(--muted)}
 .wk{display:inline-block;margin-top:4px;background:var(--soft);border-radius:999px;padding:0 10px;font-size:.8rem}
-.pin{width:34px;height:34px;border-radius:50%;background:var(--card);border:3px solid var(--accent);color:var(--fg);font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.pin{position:relative;width:38px;height:38px;border-radius:50%;overflow:hidden;background:var(--card);border:3px solid var(--accent);color:var(--fg);font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.pin img{width:100%;height:100%;object-fit:cover}.pin .pin-rank{position:absolute;right:-1px;bottom:-1px;min-width:16px;height:16px;padding:0 3px;border-radius:8px;background:rgba(31,42,55,.86);color:#fff;font-size:10px;line-height:16px;text-align:center}
 .pin.vis{background:var(--ok);color:#fff;border-color:var(--ok)}
 .pin.sel{border-color:#e11d48;transform:scale(1.2)}
 .leaflet-popup-content{margin:12px 14px}.map-popup strong{display:block;font-size:1rem}.map-popup small{display:block;color:var(--muted);margin-top:3px}
@@ -250,7 +251,7 @@ function rankFor(s){var ranked=S.filter(ok).sort(cmp);for(var i=0;i<ranked.lengt
 function popupContent(s){var rank=rankFor(s);return '<div class="map-popup"><strong>'+(rank?rank+"位 ":"")+s.n+'</strong><span>'+s.g+'</span><small>'+yen(s.p)+'〜　徒歩'+s.w+'分</small><small>'+(vis[s.id]?"✓ 訪問済み":"未訪問のお店")+'</small></div>'}
 function icon(s){var c="pin"+(st.sel===s.id?" sel":"")+(vis[s.id]?" vis":"")+(ok(s)?"":" dim");
  var rank=rankFor(s);
- return L.divIcon({className:"",html:'<div class="'+c+'" style="border-color:'+genreColor(s)+'">'+(rank||"・")+'</div><div class="pl">'+SN[s.id]+'</div>',iconSize:[34,34],iconAnchor:[17,17]})}
+ return L.divIcon({className:"",html:'<div class="'+c+'" style="border-color:'+genreColor(s)+'"><img src="images/store-'+s.id+'-food.jpg" alt=""><span class="pin-rank">'+(rank||"・")+'</span></div><div class="pl">'+SN[s.id]+'</div>',iconSize:[38,38],iconAnchor:[19,19]})}
 var mk={};
 S.forEach(function(s){mk[s.id]=L.marker([s.lat,s.lng],{icon:icon(s),title:s.n}).addTo(map).bindPopup(popupContent(s)).on("click",function(){pick(s.id,false)})});
 function pick(id,fromList){st.sel=id;randomChoice=false;var s=find(id);lg("open_detail",{store:s.n});render();showRoute(s);map.panTo([s.lat,s.lng]);
