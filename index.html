@@ -208,7 +208,8 @@ function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 vis=ld("vis",{});logs=ld("logs",[]);
 function lg(type,o){o=o||{};o.t=new Date().toISOString();o.type=type;logs.push(o);sv("logs",logs);document.getElementById("log").value=JSON.stringify(logs,null,1)}
 function yen(n){return n.toLocaleString("ja-JP")+"円"}
-function ok(s){return (!st.b||(st.b==="low"?s.p<=1000:s.p>=1001))&&(!st.c||(st.c==="rice"?s.c!=="洋食":s.c===st.c))&&(!st.w||s.w<=st.w)}
+function closedToday(s){var closed=s.cl;if(closed==="なし"||closed==="不定休")return false;var today=new Date(),day=["日曜","月曜","火曜","水曜","木曜","金曜","土曜"][today.getDay()];if(day!=="火曜")return closed.indexOf(day)>=0;if(closed.indexOf("火曜")<0)return false;var match=closed.match(/第([1-5])(?:、第([1-5]))?火曜/),week=Math.ceil(today.getDate()/7);return match?week===+match[1]||week===+match[2]:true}
+function ok(s){return !closedToday(s)&&(!st.b||(st.b==="low"?s.p<=1000:s.p>=1001))&&(!st.c||(st.c==="rice"?s.c!=="洋食":s.c===st.c))&&(!st.w||s.w<=st.w)}
 function cmp(a,b){var visited=(vis[a.id]?1:0)-(vis[b.id]?1:0);if(visited)return visited;if(st.o==="p")return a.p-b.p;if(st.o==="w")return DISTANCE_ORDER.indexOf(a.id)-DISTANCE_ORDER.indexOf(b.id);if(st.o==="g"&&st.c)return (a.c===st.c?0:1)-(b.c===st.c?0:1)||a.id-b.id;return a.id-b.id}
 function updatePrioritySelection(){var selected=!!st.q;document.getElementById("genreGroup").hidden=st.q!=="c";document.getElementById("budgetGroup").hidden=st.q!=="b";document.getElementById("postChoice").hidden=!selected;document.getElementById("filterTools").hidden=!selected;if(selected)window.setTimeout(function(){map.invalidateSize()},0)}
 function nextUnvisited(current){var candidates=S.filter(function(store){return store.id!==current.id&&!vis[store.id]&&ok(store)}).sort(cmp);return candidates[0]||S.filter(function(store){return store.id!==current.id&&!vis[store.id]}).sort(cmp)[0]}
